@@ -1,0 +1,2 @@
+# Docs now pulled straight from SVN
+RedirectMatch 301 ^/doc/html/(.+)$ https://svn.code.sf.net/p/lame/svn/trunk/lame/doc/html/$1
