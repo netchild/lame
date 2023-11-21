@@ -1,5 +1,0 @@
-Fix build on cygwin with configure options --disable-static --enable-shared --disable-decoder.
-
-Submitted by:	Carlo Bramini
-Patch:		#97
-

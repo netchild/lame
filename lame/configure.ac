@@ -20,9 +20,10 @@ dnl FRONTEND_LDADD
 dnl extra vars for libmp3lame:
 dnl LIBMP3LAME_LDADD
 
-AC_PREREQ(2.69)
+AC_PREREQ([2.71])
 AC_INIT([lame],[3.101],[lame-dev@lists.sf.net])
 AC_CONFIG_SRCDIR([libmp3lame/lame.c])
+AC_CONFIG_MACRO_DIRS([m4])
 AC_LANG([C])
 
 dnl check system
@@ -41,9 +42,8 @@ AM_MAKE_INCLUDE
 PKG_PROG_PKG_CONFIG([])
 
 dnl check environment
-AC_AIX
-AC_ISC_POSIX
-AC_MINIX
+AC_SEARCH_LIBS([strerror],[cposix])
+AC_USE_SYSTEM_EXTENSIONS
 case $host_os in
   *cygwin* ) CYGWIN=yes;;
          * ) CYGWIN=no;;
@@ -51,7 +51,7 @@ esac
 
 dnl libtool
 # AC_DISABLE_SHARED
-AC_PROG_LIBTOOL
+LT_INIT
 AC_SUBST(LIBTOOL_DEPS)
 CFLAGS="${ac_save_CFLAGS}"
 
@@ -126,7 +126,6 @@ if test "${ac_cv_header_dmalloc_h}" = "yes"; then
 fi
 
 dnl Checks for header files.
-AC_HEADER_STDC
 AC_CHECK_HEADERS( \
 		 errno.h \
 		 fcntl.h \
@@ -186,8 +185,14 @@ if test $ac_cv_sizeof_short -eq 0 \
 	exit 1
 fi
 
-AC_C_LONG_DOUBLE
-if test "${ac_cv_c_have_long_double}" = "yes" ; then
+    AC_TYPE_LONG_DOUBLE_WIDER
+    ac_cv_c_long_double=$ac_cv_type_long_double_wider
+    if test $ac_cv_c_long_double = yes; then
+      AC_DEFINE([HAVE_LONG_DOUBLE],[1],[Define to 1 if the type `long double' works and has more range or
+	 precision than `double'.])
+    fi
+  
+if test "${ac_cv_c_long_double}" = "yes" ; then
 	AC_CHECK_SIZEOF(long double)
 fi
 
@@ -375,7 +380,14 @@ if test ${cross_compiling} = "yes"; then
 fi
 
 AC_TYPE_SIZE_T
-AC_HEADER_TIME
+AC_CHECK_HEADERS_ONCE([sys/time.h])
+# Obsolete code to be removed.
+if test $ac_cv_header_sys_time_h = yes; then
+  AC_DEFINE([TIME_WITH_SYS_TIME],[1],[Define to 1 if you can safely include both <sys/time.h>
+	     and <time.h>.  This macro is obsolete.])
+fi
+# End of obsolete code.
+
 
 dnl Checks for library functions.
 AC_FUNC_ALLOCA
@@ -625,6 +637,36 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+#Checking for IPV6 support
+AC_MSG_CHECKING(for IPv6 support)
+AC_ARG_ENABLE(ipv6, AS_HELP_STRING([--disable-ipv6],
+    [Disable IPV6 support(By default ipv6 (with ipv4) support is enabled)]),
+    CONFIG_IPV6=$enableval,
+    CONFIG_IPV6=yes)
+if test "x$CONFIG_IPV6" = "xyes" ; then
+    AC_CACHE_VAL(ac_cv_ipv6,
+    AC_TRY_RUN([
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <stdlib.h>
+    main()
+    {
+        int fd;
+        struct sockaddr_in6 foo;
+        fd = socket(AF_INET6, SOCK_STREAM, 0);
+        exit(fd >= 0 ? 0 : 1);
+    }],
+    ac_cv_ipv6=yes,
+    ac_cv_ipv6=no,
+    ac_cv_ipv6=yes))
+    AC_MSG_RESULT($ac_cv_ipv6)
+    if test $ac_cv_ipv6 = yes ; then
+        AC_DEFINE(IPV6,1,[check if system supports IPV6])
+    fi
+else
+    AC_MSG_RESULT($CONFIG_IPV6)	
+fi
 AC_MSG_CHECKING(if dynamic linking of the frontends is requested)
 AC_ARG_ENABLE(dynamic-frontends,
   [  --enable-dynamic-frontends Link frontends against shared libraries [default=no]],
@@ -1260,6 +1302,7 @@ AC_SUBST(CONFIG_DEFS)
 AC_CONFIG_FILES([Makefile \
 		 libmp3lame/Makefile \
 		 libmp3lame/i386/Makefile \
+		 libmp3lame/lame.pc \
 		 libmp3lame/vector/Makefile \
 		 frontend/Makefile \
 		 mpglib/Makefile \
