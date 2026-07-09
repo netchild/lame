@@ -38,7 +38,7 @@
 <h3>Current Versions</h3>
 
 <ul>
-    <li>The current release version of LAME is 3.100</li>
+    <li>The current release version of LAME is 3.101</li>
 
     <!-- Comment/hide this item if there is no current beta.
     <li>The most recent beta release of LAME is 3.97beta3.</li>-->

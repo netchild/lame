@@ -304,17 +304,16 @@ char* toUtf8( char* src )
     size_t w = currCharCodeSize();
     char* dst = 0;
     if (src != 0) {
+        /* XXX: size calculation for UTF-16, a bit too much for UTF-8, but not too small */
         size_t const l = strlenMultiByte(src, w);
         size_t const n = (l+1)*4;
         dst = calloc(n+4, 4);
         if (dst != 0) {
             char* cur_code = currentCharacterEncoding();
             iconv_t xiconv = iconv_open("UTF-8//TRANSLIT", cur_code);
-            dst[0] = 0xff;
-            dst[1] = 0xfe;
             if (xiconv != (iconv_t)-1) {
                 char* i_ptr = (char*)src;
-                char* o_ptr = &dst[2];
+                char* o_ptr = &dst[0];
                 size_t srcln = l*w;
                 size_t avail = n;
                 iconv(xiconv, &i_ptr, &srcln, &o_ptr, &avail);
@@ -367,6 +366,11 @@ unsigned short* toUtf16(char const* s)
 {
     return utf8ToUtf16(s);
 }
+
+char* toUtf8(char const* s)
+{
+    return local8BitToUtf8(s);
+}
 #endif
 
 static int evaluateArgument(char const* token, char const* arg, char* _EndPtr)
@@ -399,20 +403,39 @@ static int getIntValue(char const* token, char const* arg, int* ptr)
 
 #ifdef ID3TAGS_EXTENDED
 static int
-set_id3v2tag(lame_global_flags* gfp, int type, unsigned short const* str)
+set_id3v2tag(lame_global_flags* gfp, TextEncoding enc, int type, unsigned short const* str)
 {
-    switch (type)
+    switch (enc)
     {
-        case 'a': return id3tag_set_textinfo_utf16(gfp, "TPE1", str);
-        case 't': return id3tag_set_textinfo_utf16(gfp, "TIT2", str);
-        case 'l': return id3tag_set_textinfo_utf16(gfp, "TALB", str);
-        case 'g': return id3tag_set_textinfo_utf16(gfp, "TCON", str);
-        case 'c': return id3tag_set_comment_utf16(gfp, 0, 0, str);
-        case 'n': return id3tag_set_textinfo_utf16(gfp, "TRCK", str);
-        case 'y': return id3tag_set_textinfo_utf16(gfp, "TYER", str);
-        case 'v': return id3tag_set_fieldvalue_utf16(gfp, str);
+        case TENC_UTF8:
+            switch (type)
+            {
+                case 'a': return id3tag_set_textinfo_utf8(gfp, "TPE1", str);
+                case 't': return id3tag_set_textinfo_utf8(gfp, "TIT2", str);
+                case 'l': return id3tag_set_textinfo_utf8(gfp, "TALB", str);
+                case 'g': return id3tag_set_textinfo_utf8(gfp, "TCON", str);
+                case 'c': return id3tag_set_comment_ucs2(gfp, 0, 0, str);
+                case 'n': return id3tag_set_textinfo_utf8(gfp, "TRCK", str);
+                case 'y': return id3tag_set_textinfo_utf8(gfp, "TYER", str);
+                case 'v': return id3tag_set_fieldvalue_ucs2(gfp, str);
+            }
+            ;;
+        case TENC_UTF16:
+            switch (type)
+            {
+                case 'a': return id3tag_set_textinfo_utf16(gfp, "TPE1", str);
+                case 't': return id3tag_set_textinfo_utf16(gfp, "TIT2", str);
+                case 'l': return id3tag_set_textinfo_utf16(gfp, "TALB", str);
+                case 'g': return id3tag_set_textinfo_utf16(gfp, "TCON", str);
+                case 'c': return id3tag_set_comment_utf16(gfp, 0, 0, str);
+                case 'n': return id3tag_set_textinfo_utf16(gfp, "TRCK", str);
+                case 'y': return id3tag_set_textinfo_utf16(gfp, "TYER", str);
+                case 'v': return id3tag_set_fieldvalue_utf16(gfp, str);
+            }
+            ;;
+        default:
+            return -3;
     }
-    return 0;
 }
 #endif
 
@@ -438,7 +461,7 @@ id3_tag(lame_global_flags* gfp, int type, TextEncoding enc, char* str)
 {
     void* x = 0;
     int result;
-    if (enc == TENC_UTF16 && type != 'v' ) {
+    if ((enc == TENC_UTF16 || enc == TENC_UTF8) && type != 'v' ) {
         id3_tag(gfp, type, TENC_LATIN1, str); /* for id3v1 */
     }
     switch (enc) 
@@ -457,8 +480,8 @@ id3_tag(lame_global_flags* gfp, int type, TextEncoding enc, char* str)
         default:
 #ifdef ID3TAGS_EXTENDED
         case TENC_LATIN1: result = set_id3tag(gfp, type, x);   break;
-        case TENC_UTF16:  result = set_id3v2tag(gfp, type, x); break;
-        case TENC_UTF8:   result = set_id3v2tag(gfp, type, x); break;
+        case TENC_UTF16:  result = set_id3v2tag(gfp, enc, type, x); break;
+        case TENC_UTF8:   result = set_id3v2tag(gfp, enc, type, x); break;
 #else
         case TENC_RAW:    result = set_id3tag(gfp, type, x);   break;
 #endif
@@ -1591,7 +1614,7 @@ parse_args_(lame_global_flags * gfp, int argc, char **argv,
     int     id3tag_mode = ID3TAG_MODE_DEFAULT;
     int     ignore_tag_errors = 0;  /* Ignore errors in values passed for tags */
 #ifdef ID3TAGS_EXTENDED
-    enum TextEncoding id3_tenc = TENC_UTF8;
+    enum TextEncoding id3_tenc = TENC_UTF16;
 #else
     enum TextEncoding id3_tenc = TENC_LATIN1;
 #endif
