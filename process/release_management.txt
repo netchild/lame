@@ -17,6 +17,6 @@
 - click on the (i) button of the version directory
 - remove the hook from the "Stage this folder for 3 days"
 - save
-- send mail to lame-dev@list.sourceforge.net
+- send mail to lame-dev@lists.sourceforge.net
 - update website (index.php and download.php) to point to the latest LAME release (see website_update.txt)
 
