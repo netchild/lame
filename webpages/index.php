@@ -31,8 +31,8 @@
 	LGPL.
 </p>
 
-<h3 id="latest_release">Latest LAME release: <a href="download.php">v3.101</a>
-(October 2017)</h3>
+<h3 id="latest_release">Latest LAME release: <a href="download.php">v4.0</a>
+(July 2026)</h3>
 
 <p>
 	LAME development started around mid-1998. Mike Cheng started it as a patch

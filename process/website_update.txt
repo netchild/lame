@@ -1,4 +1,12 @@
-- update the website in SVN
+- update the website in SVN (remove --dry-run to really update)
+- assumption: you are in the website directory
+- rsync --dry-run --8-bit-output --human-readable --recursive --links --perms --delete --delete-after --new-compress --info=progress2 -e ssh . $USERNAME@web.sourceforge.net:/home/project-web/lame/htdocs/
+
+---
+The following does not seem to work anymore, I get connection timeouts for
+  shell.sf.net
+  shell.soruceforge.net
+
 - login to a SF shell (ssh -t $USERNAME@shell.sf.net create)
 - cd /home/project-web/lame/htdocs
 - run "./siteupdate.sh"

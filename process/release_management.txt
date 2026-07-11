@@ -7,8 +7,7 @@
 - create ChangeLog (run make_changelog.sh) and commit
 - tag the release, e.g. for lame-3.100:
     svn copy --username=$USERNAME svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/trunk/lame svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/tags/lame3_100
-    svn copy --username=$USERNAME svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/trunk/lame svn+ssh://$USERNAME@svn.code.
-sf.net/p/lame/svn/tags/RELEASE__3_100
+    svn copy --username=$USERNAME svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/trunk/lame svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/tags/RELEASE__3_100
 - TBD: delete all files if in separate build directory and re-build (to get new ChangeLog)?
 - make dist
 - upload lame-<version>.tar.gz to the version directory create above
@@ -18,6 +17,6 @@ sf.net/p/lame/svn/tags/RELEASE__3_100
 - click on the (i) button of the version directory
 - remove the hook from the "Stage this folder for 3 days"
 - save
-- send mail to lame-dev@list.sf.net
+- send mail to lame-dev@list.sourceforge.net
 - update website (index.php and download.php) to point to the latest LAME release (see website_update.txt)
 
