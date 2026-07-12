@@ -3,3 +3,7 @@
 # lands in an out-of-tree build directory, never here, so it needs no
 # ignore entry of its own.
 /doc/Doxyfile
+
+# autotools cache
+autom4te.cache/
+
