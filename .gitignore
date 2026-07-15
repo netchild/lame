@@ -1,3 +1,7 @@
+# This file belongs to the git mirror alone; Subversion has no counterpart and
+# does not read it. A rule added here therefore keeps a file Subversion tracks
+# out of the mirror, without either side reporting anything.
+
 # Prerequisites
 *.d
 
@@ -15,6 +19,9 @@
 # Precompiled Headers
 *.gch
 *.pch
+# The Macintosh CodeWarrior build keeps the precompile *sources* under this
+# extension, and ships them; only the compiler output above is unwanted.
+!lame/mac/*.pch
 
 # Libraries
 *.lib
