@@ -381,6 +381,7 @@ SUBDIRS = mpglib libmp3lame frontend Dll doc include misc dshow ACM \
 
 CLEANFILES = testcase.new.mp3
 EXTRA_DIST = \
+	.clang-format \
 	API \
 	DEFINES \
 	HACKING \
@@ -400,7 +401,11 @@ EXTRA_DIST = \
 	testcase.mp3 \
 	testcase.wav \
 	maintainer/gen-build-matrix.sh \
-	maintainer/gen-build-matrix.ps1
+	maintainer/gen-build-matrix.ps1 \
+	maintainer/setup-windows-deps.ps1 \
+	maintainer/perf-compare.sh \
+	maintainer/setup-quality-corpus.sh \
+	maintainer/quality-compare.py
 
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
