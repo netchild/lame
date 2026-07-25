@@ -100,8 +100,17 @@ host_triplet = @host@
 @ENABLE_UNIT_TESTS_TRUE@	test_encode_nonfinite$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_encode_mono_interleaved$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_totalframes$(EXEEXT) \
-@ENABLE_UNIT_TESTS_TRUE@	test_set_get$(EXEEXT)
-@ENABLE_UNIT_TESTS_TRUE@@INTERNAL_OPTS_TRUE@am__append_1 = -D_ALLOW_INTERNAL_OPTIONS
+@ENABLE_UNIT_TESTS_TRUE@	test_set_get$(EXEEXT) $(am__EXEEXT_1)
+
+# The vectorised routines exist only where the vector code was built, so there
+# is nothing to test otherwise.
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@am__append_1 = test_choose_table_vector test_quantize_lines_vector \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	test_calc_sfb_noise_vector
+
+@ENABLE_UNIT_TESTS_TRUE@@INTERNAL_OPTS_TRUE@am__append_2 = -D_ALLOW_INTERNAL_OPTIONS
+@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX2_TRUE@@WITH_XMM_TRUE@am__append_3 = $(top_builddir)/libmp3lame/vector/liblamevectoravx2.la
+@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX2_TRUE@@WITH_XMM_TRUE@am__append_4 = $(top_builddir)/libmp3lame/vector/liblamevectoravx2.la
+@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX2_TRUE@@WITH_XMM_TRUE@am__append_5 = $(top_builddir)/libmp3lame/vector/liblamevectoravx2.la
 subdir = test/unit
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/host-cpu-c-abi.m4 \
@@ -118,19 +127,40 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@am__EXEEXT_1 = test_choose_table_vector$(EXEEXT) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	test_quantize_lines_vector$(EXEEXT) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	test_calc_sfb_noise_vector$(EXEEXT)
+am__test_calc_sfb_noise_vector_SOURCES_DIST =  \
+	test_calc_sfb_noise_vector.c
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@am_test_calc_sfb_noise_vector_OBJECTS = test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.$(OBJEXT)
+test_calc_sfb_noise_vector_OBJECTS =  \
+	$(am_test_calc_sfb_noise_vector_OBJECTS)
+am__DEPENDENCIES_1 =
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_calc_sfb_noise_vector_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__DEPENDENCIES_1) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_5)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
+am__test_choose_table_vector_SOURCES_DIST =  \
+	test_choose_table_vector.c
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@am_test_choose_table_vector_OBJECTS = test_choose_table_vector-test_choose_table_vector.$(OBJEXT)
+test_choose_table_vector_OBJECTS =  \
+	$(am_test_choose_table_vector_OBJECTS)
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_choose_table_vector_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__DEPENDENCIES_1) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_3)
 am__test_encode_mono_interleaved_SOURCES_DIST =  \
 	test_encode_mono_interleaved.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_encode_mono_interleaved_OBJECTS = test_encode_mono_interleaved-test_encode_mono_interleaved.$(OBJEXT)
 test_encode_mono_interleaved_OBJECTS =  \
 	$(am_test_encode_mono_interleaved_OBJECTS)
-am__DEPENDENCIES_1 =
 @ENABLE_UNIT_TESTS_TRUE@test_encode_mono_interleaved_DEPENDENCIES =  \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 am__test_encode_nonfinite_SOURCES_DIST = test_encode_nonfinite.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_encode_nonfinite_OBJECTS = test_encode_nonfinite-test_encode_nonfinite.$(OBJEXT)
 test_encode_nonfinite_OBJECTS = $(am_test_encode_nonfinite_OBJECTS)
@@ -182,6 +212,15 @@ test_parse_pathlen_OBJECTS = $(am_test_parse_pathlen_OBJECTS)
 @ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1)
+am__test_quantize_lines_vector_SOURCES_DIST =  \
+	test_quantize_lines_vector.c
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@am_test_quantize_lines_vector_OBJECTS = test_quantize_lines_vector-test_quantize_lines_vector.$(OBJEXT)
+test_quantize_lines_vector_OBJECTS =  \
+	$(am_test_quantize_lines_vector_OBJECTS)
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__DEPENDENCIES_1) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_4)
 am__test_sanity_SOURCES_DIST = test_sanity.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_sanity_OBJECTS =  \
 @ENABLE_UNIT_TESTS_TRUE@	test_sanity-test_sanity.$(OBJEXT)
@@ -219,7 +258,9 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po \
+am__depfiles_remade = ./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po \
+	./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po \
+	./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po \
 	./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po \
 	./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po \
 	./$(DEPDIR)/test_get_audio_aiff-test_stubs.Po \
@@ -230,6 +271,7 @@ am__depfiles_remade = ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_
 	./$(DEPDIR)/test_parse_id3-test_parse_id3.Po \
 	./$(DEPDIR)/test_parse_pathlen-parse_test_stubs.Po \
 	./$(DEPDIR)/test_parse_pathlen-test_parse_pathlen.Po \
+	./$(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po \
 	./$(DEPDIR)/test_sanity-test_sanity.Po \
 	./$(DEPDIR)/test_set_get-test_set_get.Po \
 	./$(DEPDIR)/test_totalframes-test_totalframes.Po
@@ -252,19 +294,25 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(test_encode_mono_interleaved_SOURCES) \
+SOURCES = $(test_calc_sfb_noise_vector_SOURCES) \
+	$(test_choose_table_vector_SOURCES) \
+	$(test_encode_mono_interleaved_SOURCES) \
 	$(test_encode_nonfinite_SOURCES) \
 	$(test_get_audio_aiff_SOURCES) $(test_id3tag_SOURCES) \
 	$(test_merge_argv_SOURCES) $(test_parse_id3_SOURCES) \
-	$(test_parse_pathlen_SOURCES) $(test_sanity_SOURCES) \
+	$(test_parse_pathlen_SOURCES) \
+	$(test_quantize_lines_vector_SOURCES) $(test_sanity_SOURCES) \
 	$(test_set_get_SOURCES) $(test_totalframes_SOURCES)
-DIST_SOURCES = $(am__test_encode_mono_interleaved_SOURCES_DIST) \
+DIST_SOURCES = $(am__test_calc_sfb_noise_vector_SOURCES_DIST) \
+	$(am__test_choose_table_vector_SOURCES_DIST) \
+	$(am__test_encode_mono_interleaved_SOURCES_DIST) \
 	$(am__test_encode_nonfinite_SOURCES_DIST) \
 	$(am__test_get_audio_aiff_SOURCES_DIST) \
 	$(am__test_id3tag_SOURCES_DIST) \
 	$(am__test_merge_argv_SOURCES_DIST) \
 	$(am__test_parse_id3_SOURCES_DIST) \
 	$(am__test_parse_pathlen_SOURCES_DIST) \
+	$(am__test_quantize_lines_vector_SOURCES_DIST) \
 	$(am__test_sanity_SOURCES_DIST) \
 	$(am__test_set_get_SOURCES_DIST) \
 	$(am__test_totalframes_SOURCES_DIST)
@@ -600,6 +648,7 @@ SHELL = @SHELL@
 SNDFILE_CFLAGS = @SNDFILE_CFLAGS@
 SNDFILE_LIBS = @SNDFILE_LIBS@
 STRIP = @STRIP@
+VECTOR_AVX2_FLAGS = @VECTOR_AVX2_FLAGS@
 VECTOR_SSE2_FLAGS = @VECTOR_SSE2_FLAGS@
 VERSION = @VERSION@
 WITH_FRONTEND = @WITH_FRONTEND@
@@ -787,12 +836,59 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 @ENABLE_UNIT_TESTS_TRUE@test_set_get_CPPFLAGS = $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
-@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir) $(am__append_1)
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir) $(am__append_2)
 @ENABLE_UNIT_TESTS_TRUE@@INTERNAL_OPTS_TRUE@test_set_get_LDFLAGS = -static
 @ENABLE_UNIT_TESTS_TRUE@test_set_get_LDADD = $(CMOCKA_LIBS) \
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
 @ENABLE_UNIT_TESTS_TRUE@	-lm
 
+
+# The table-search routines are internal to the vector convenience libraries
+# and are not part of libmp3lame's exported interface, so this test links
+# those libraries directly. It needs nothing else from the encoder: each
+# routine is a function of its arguments, tables included.
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_choose_table_vector_SOURCES = test_choose_table_vector.c
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_choose_table_vector_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/libmp3lame \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_choose_table_vector_LDADD =  \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(CMOCKA_LIBS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_3)
+
+# Same arrangement for the quantization loop, and for the same reason.
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_SOURCES = test_quantize_lines_vector.c
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/libmp3lame \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_LDADD =  \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(CMOCKA_LIBS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-lm $(am__append_4)
+
+# Same arrangement for the VBR scalefactor-band noise.
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_calc_sfb_noise_vector_SOURCES = test_calc_sfb_noise_vector.c
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_calc_sfb_noise_vector_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/libmp3lame \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_calc_sfb_noise_vector_LDADD =  \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(CMOCKA_LIBS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-lm $(am__append_5)
+
+# Kept in the tarball whether or not this build configured the vector code,
+# so a dist made on one architecture still carries the tests for another.
+
+# Header-only unused-parameter marker shared by the tests; not a _SOURCES file,
+# so it has to be named for the tarball explicitly.
+EXTRA_DIST = test_choose_table_vector.c test_quantize_lines_vector.c \
+	test_calc_sfb_noise_vector.c test_unused.h
 all: all-am
 
 .SUFFIXES:
@@ -832,6 +928,14 @@ clean-checkPROGRAMS:
 	$(am__rm_f) $(check_PROGRAMS)
 	test -z "$(EXEEXT)" || $(am__rm_f) $(check_PROGRAMS:$(EXEEXT)=)
 
+test_calc_sfb_noise_vector$(EXEEXT): $(test_calc_sfb_noise_vector_OBJECTS) $(test_calc_sfb_noise_vector_DEPENDENCIES) $(EXTRA_test_calc_sfb_noise_vector_DEPENDENCIES) 
+	@rm -f test_calc_sfb_noise_vector$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_calc_sfb_noise_vector_OBJECTS) $(test_calc_sfb_noise_vector_LDADD) $(LIBS)
+
+test_choose_table_vector$(EXEEXT): $(test_choose_table_vector_OBJECTS) $(test_choose_table_vector_DEPENDENCIES) $(EXTRA_test_choose_table_vector_DEPENDENCIES) 
+	@rm -f test_choose_table_vector$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_choose_table_vector_OBJECTS) $(test_choose_table_vector_LDADD) $(LIBS)
+
 test_encode_mono_interleaved$(EXEEXT): $(test_encode_mono_interleaved_OBJECTS) $(test_encode_mono_interleaved_DEPENDENCIES) $(EXTRA_test_encode_mono_interleaved_DEPENDENCIES) 
 	@rm -f test_encode_mono_interleaved$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_encode_mono_interleaved_OBJECTS) $(test_encode_mono_interleaved_LDADD) $(LIBS)
@@ -860,6 +964,10 @@ test_parse_pathlen$(EXEEXT): $(test_parse_pathlen_OBJECTS) $(test_parse_pathlen_
 	@rm -f test_parse_pathlen$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_parse_pathlen_OBJECTS) $(test_parse_pathlen_LDADD) $(LIBS)
 
+test_quantize_lines_vector$(EXEEXT): $(test_quantize_lines_vector_OBJECTS) $(test_quantize_lines_vector_DEPENDENCIES) $(EXTRA_test_quantize_lines_vector_DEPENDENCIES) 
+	@rm -f test_quantize_lines_vector$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_quantize_lines_vector_OBJECTS) $(test_quantize_lines_vector_LDADD) $(LIBS)
+
 test_sanity$(EXEEXT): $(test_sanity_OBJECTS) $(test_sanity_DEPENDENCIES) $(EXTRA_test_sanity_DEPENDENCIES) 
 	@rm -f test_sanity$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_sanity_OBJECTS) $(test_sanity_LDADD) $(LIBS)
@@ -878,6 +986,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po@am__quote@ # am--include-marker
@@ -889,6 +999,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_parse_id3-test_parse_id3.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_parse_pathlen-parse_test_stubs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_parse_pathlen-test_parse_pathlen.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_sanity-test_sanity.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_set_get-test_set_get.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_totalframes-test_totalframes.Po@am__quote@ # am--include-marker
@@ -919,6 +1030,34 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
+
+test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.o: test_calc_sfb_noise_vector.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_calc_sfb_noise_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.o -MD -MP -MF $(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Tpo -c -o test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.o `test -f 'test_calc_sfb_noise_vector.c' || echo '$(srcdir)/'`test_calc_sfb_noise_vector.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Tpo $(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_calc_sfb_noise_vector.c' object='test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_calc_sfb_noise_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.o `test -f 'test_calc_sfb_noise_vector.c' || echo '$(srcdir)/'`test_calc_sfb_noise_vector.c
+
+test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.obj: test_calc_sfb_noise_vector.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_calc_sfb_noise_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.obj -MD -MP -MF $(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Tpo -c -o test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.obj `if test -f 'test_calc_sfb_noise_vector.c'; then $(CYGPATH_W) 'test_calc_sfb_noise_vector.c'; else $(CYGPATH_W) '$(srcdir)/test_calc_sfb_noise_vector.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Tpo $(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_calc_sfb_noise_vector.c' object='test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_calc_sfb_noise_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.obj `if test -f 'test_calc_sfb_noise_vector.c'; then $(CYGPATH_W) 'test_calc_sfb_noise_vector.c'; else $(CYGPATH_W) '$(srcdir)/test_calc_sfb_noise_vector.c'; fi`
+
+test_choose_table_vector-test_choose_table_vector.o: test_choose_table_vector.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_choose_table_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_choose_table_vector-test_choose_table_vector.o -MD -MP -MF $(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Tpo -c -o test_choose_table_vector-test_choose_table_vector.o `test -f 'test_choose_table_vector.c' || echo '$(srcdir)/'`test_choose_table_vector.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Tpo $(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_choose_table_vector.c' object='test_choose_table_vector-test_choose_table_vector.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_choose_table_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_choose_table_vector-test_choose_table_vector.o `test -f 'test_choose_table_vector.c' || echo '$(srcdir)/'`test_choose_table_vector.c
+
+test_choose_table_vector-test_choose_table_vector.obj: test_choose_table_vector.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_choose_table_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_choose_table_vector-test_choose_table_vector.obj -MD -MP -MF $(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Tpo -c -o test_choose_table_vector-test_choose_table_vector.obj `if test -f 'test_choose_table_vector.c'; then $(CYGPATH_W) 'test_choose_table_vector.c'; else $(CYGPATH_W) '$(srcdir)/test_choose_table_vector.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Tpo $(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_choose_table_vector.c' object='test_choose_table_vector-test_choose_table_vector.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_choose_table_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_choose_table_vector-test_choose_table_vector.obj `if test -f 'test_choose_table_vector.c'; then $(CYGPATH_W) 'test_choose_table_vector.c'; else $(CYGPATH_W) '$(srcdir)/test_choose_table_vector.c'; fi`
 
 test_encode_mono_interleaved-test_encode_mono_interleaved.o: test_encode_mono_interleaved.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_mono_interleaved_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_encode_mono_interleaved-test_encode_mono_interleaved.o -MD -MP -MF $(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Tpo -c -o test_encode_mono_interleaved-test_encode_mono_interleaved.o `test -f 'test_encode_mono_interleaved.c' || echo '$(srcdir)/'`test_encode_mono_interleaved.c
@@ -1073,6 +1212,20 @@ test_parse_pathlen-parse_test_stubs.obj: parse_test_stubs.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='parse_test_stubs.c' object='test_parse_pathlen-parse_test_stubs.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_parse_pathlen_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_parse_pathlen-parse_test_stubs.obj `if test -f 'parse_test_stubs.c'; then $(CYGPATH_W) 'parse_test_stubs.c'; else $(CYGPATH_W) '$(srcdir)/parse_test_stubs.c'; fi`
+
+test_quantize_lines_vector-test_quantize_lines_vector.o: test_quantize_lines_vector.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_quantize_lines_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_quantize_lines_vector-test_quantize_lines_vector.o -MD -MP -MF $(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Tpo -c -o test_quantize_lines_vector-test_quantize_lines_vector.o `test -f 'test_quantize_lines_vector.c' || echo '$(srcdir)/'`test_quantize_lines_vector.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Tpo $(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_quantize_lines_vector.c' object='test_quantize_lines_vector-test_quantize_lines_vector.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_quantize_lines_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_quantize_lines_vector-test_quantize_lines_vector.o `test -f 'test_quantize_lines_vector.c' || echo '$(srcdir)/'`test_quantize_lines_vector.c
+
+test_quantize_lines_vector-test_quantize_lines_vector.obj: test_quantize_lines_vector.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_quantize_lines_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_quantize_lines_vector-test_quantize_lines_vector.obj -MD -MP -MF $(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Tpo -c -o test_quantize_lines_vector-test_quantize_lines_vector.obj `if test -f 'test_quantize_lines_vector.c'; then $(CYGPATH_W) 'test_quantize_lines_vector.c'; else $(CYGPATH_W) '$(srcdir)/test_quantize_lines_vector.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Tpo $(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_quantize_lines_vector.c' object='test_quantize_lines_vector-test_quantize_lines_vector.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_quantize_lines_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_quantize_lines_vector-test_quantize_lines_vector.obj `if test -f 'test_quantize_lines_vector.c'; then $(CYGPATH_W) 'test_quantize_lines_vector.c'; else $(CYGPATH_W) '$(srcdir)/test_quantize_lines_vector.c'; fi`
 
 test_sanity-test_sanity.o: test_sanity.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_sanity_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_sanity-test_sanity.o -MD -MP -MF $(DEPDIR)/test_sanity-test_sanity.Tpo -c -o test_sanity-test_sanity.o `test -f 'test_sanity.c' || echo '$(srcdir)/'`test_sanity.c
@@ -1410,6 +1563,27 @@ test_set_get.log: test_set_get$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_choose_table_vector.log: test_choose_table_vector$(EXEEXT)
+	@p='test_choose_table_vector$(EXEEXT)'; \
+	b='test_choose_table_vector'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_quantize_lines_vector.log: test_quantize_lines_vector$(EXEEXT)
+	@p='test_quantize_lines_vector$(EXEEXT)'; \
+	b='test_quantize_lines_vector'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_calc_sfb_noise_vector.log: test_calc_sfb_noise_vector$(EXEEXT)
+	@p='test_calc_sfb_noise_vector$(EXEEXT)'; \
+	b='test_calc_sfb_noise_vector'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 .test.log:
 	@p='$<'; \
 	$(am__set_b); \
@@ -1503,6 +1677,8 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
+	-rm -f ./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
+	-rm -f ./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po
 	-rm -f ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po
 	-rm -f ./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po
 	-rm -f ./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po
@@ -1514,6 +1690,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/test_parse_id3-test_parse_id3.Po
 	-rm -f ./$(DEPDIR)/test_parse_pathlen-parse_test_stubs.Po
 	-rm -f ./$(DEPDIR)/test_parse_pathlen-test_parse_pathlen.Po
+	-rm -f ./$(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po
 	-rm -f ./$(DEPDIR)/test_sanity-test_sanity.Po
 	-rm -f ./$(DEPDIR)/test_set_get-test_set_get.Po
 	-rm -f ./$(DEPDIR)/test_totalframes-test_totalframes.Po
@@ -1562,6 +1739,8 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
+	-rm -f ./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
+	-rm -f ./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po
 	-rm -f ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po
 	-rm -f ./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po
 	-rm -f ./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po
@@ -1573,6 +1752,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/test_parse_id3-test_parse_id3.Po
 	-rm -f ./$(DEPDIR)/test_parse_pathlen-parse_test_stubs.Po
 	-rm -f ./$(DEPDIR)/test_parse_pathlen-test_parse_pathlen.Po
+	-rm -f ./$(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po
 	-rm -f ./$(DEPDIR)/test_sanity-test_sanity.Po
 	-rm -f ./$(DEPDIR)/test_set_get-test_set_get.Po
 	-rm -f ./$(DEPDIR)/test_totalframes-test_totalframes.Po
