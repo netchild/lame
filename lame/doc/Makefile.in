@@ -363,7 +363,7 @@ edit_doxyfile = \
 	if test -n "$(DOT)"; then have_dot=YES; dot_path=`dirname "$(DOT)"`; \
 	else have_dot=NO; dot_path=; fi; \
 	strip_path=`dirname "$(top_srcdir)"`; \
-	sed -e 's|@top_srcdir@|$(top_srcdir)|g' \
+	sed -e 's|@LAME_SRCDIR@|$(top_srcdir)|g' \
 	    -e "s|@HAVE_DOT@|$$have_dot|g" \
 	    -e "s|@DOT_PATH@|$$dot_path|g" \
 	    -e "s|@STRIP_FROM_PATH@|$$strip_path|g" \
@@ -375,6 +375,9 @@ EXTRA_DIST = Doxyfile.in Doxyfile-common.in Doxyfile-internal.in \
 	maintainer-perf.md \
 	maintainer-quality.md \
 	maintainer-coverage.md \
+	maintainer-abi.md \
+	maintainer-check-dist.md \
+	maintainer-gen-api-docs.md \
 	doxygen/mainpage.md \
 	doxygen/internal.md \
 	doxygen/unit_tests.dox \
