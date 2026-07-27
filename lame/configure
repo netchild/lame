@@ -660,8 +660,11 @@ CONFIG_MATH_LIB
 LIBMP3LAME_LDADD
 FRONTEND_LDADD
 FRONTEND_CFLAGS
+FRONTEND_UNICODE_LDFLAGS
 FRONTEND_LDFLAGS
 INCLUDES
+LTLIBICONV
+LIBICONV
 WITH_VECTOR_FALSE
 WITH_VECTOR_TRUE
 WITH_AVX2_FALSE
@@ -670,6 +673,7 @@ WITH_XMM_FALSE
 WITH_XMM_TRUE
 VECTOR_AVX2_FLAGS
 VECTOR_SSE2_FLAGS
+CPP
 INTERNAL_OPTS_FALSE
 INTERNAL_OPTS_TRUE
 LIB_WITH_DECODER_FALSE
@@ -680,10 +684,6 @@ SNDFILE_LIBS
 SNDFILE_CFLAGS
 GTK_LIBS
 GTK_CFLAGS
-GTK_CONFIG
-LTLIBICONV
-LIBICONV
-CPP
 ALLOCA
 LIBTOOL_DEPS
 LT_SYS_LIBRARY_PATH
@@ -832,18 +832,13 @@ enable_libtool_lock
 with_dmalloc
 enable_largefile
 enable_ieeehack
-enable_rpath
-with_libiconv_prefix
 enable_cpml
-with_gtk_prefix
-with_gtk_exec_prefix
-enable_gtktest
 enable_efence
 with_fileio
 enable_analyzer_hooks
+enable_mp3x
 enable_decoder
 enable_frontend
-enable_mp3x
 enable_mp3rtp
 enable_ipv6
 enable_dynamic_frontends
@@ -852,6 +847,8 @@ enable_expopt
 enable_hardening
 enable_native
 enable_debug
+enable_rpath
+with_libiconv_prefix
 enable_unit_tests
 enable_year2038
 '
@@ -867,11 +864,13 @@ PKG_CONFIG
 PKG_CONFIG_PATH
 PKG_CONFIG_LIBDIR
 LT_SYS_LIBRARY_PATH
-CPP
+GTK_CFLAGS
+GTK_LIBS
 SNDFILE_CFLAGS
 SNDFILE_LIBS
 mpg123_CFLAGS
 mpg123_LIBS
+CPP
 CMOCKA_CFLAGS
 CMOCKA_LIBS'
 
@@ -1522,14 +1521,12 @@ Optional Features:
   --disable-libtool-lock  avoid locking (might break parallel builds)
   --disable-largefile     omit support for large files
   --enable-ieeehack       Enable Takhiros IEEE754 hack (speed improvement for old CPUs)
-  --disable-rpath         do not hardcode runtime library paths
   --disable-cpml          Do not use Compaq's fast Math Library
-  --disable-gtktest       Do not try to compile and run a test GTK program
   --enable-efence         Use ElectricFence for malloc debugging
   --disable-analyzer-hooks Exclude analyzer hooks
+  --enable-mp3x           Build GTK4 frame analyzer default=no
   --disable-decoder          Exclude mpg123 decoder
   --disable-frontend      Do not build the lame executable default=build
-  --enable-mp3x           Build GTK frame analyzer default=no
   --enable-mp3rtp         Build mp3rtp default=no
   --disable-ipv6          Disable IPV6 support(By default ipv6 (with ipv4)
                           support is enabled)
@@ -1547,6 +1544,7 @@ Optional Features:
                           (default: disabled)
   --enable-debug=alot,norm Enable debugging (disables optimizations)
                            default=no
+  --disable-rpath         do not hardcode runtime library paths
   --enable-unit-tests     build the CMocka-based unit tests, run with "make
                           check" [default=no]
   --enable-year2038       support timestamps after 2038
@@ -1560,14 +1558,12 @@ Optional Packages:
   --with-sysroot[=DIR]    Search for dependent libraries within DIR (or the
                           compiler's sysroot if not specified).
   --with-dmalloc          use dmalloc, as in http://www.dmalloc.com
-  --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
-  --with-libiconv-prefix[=DIR]  search for libiconv in DIR/include and DIR/lib
-  --without-libiconv-prefix     don't search for libiconv in includedir and libdir
-  --with-gtk-prefix=PFX   Prefix where GTK is installed (optional)
-  --with-gtk-exec-prefix=PFX Exec prefix where GTK is installed (optional)
   --with-fileio=lame      Use lame's internal file io routines default
                =sndfile   Use Erik de Castro Lopo's libsndfile
                           (no stdin possible currently)
+  --with-gnu-ld           assume the C compiler uses GNU ld [default=no]
+  --with-libiconv-prefix[=DIR]  search for libiconv in DIR/include and DIR/lib
+  --without-libiconv-prefix     don't search for libiconv in includedir and libdir
 
 Some influential environment variables:
   CC          C compiler command
@@ -1584,7 +1580,8 @@ Some influential environment variables:
               path overriding pkg-config's built-in search path
   LT_SYS_LIBRARY_PATH
               User-defined run-time library search path.
-  CPP         C preprocessor
+  GTK_CFLAGS  C compiler flags for GTK, overriding pkg-config
+  GTK_LIBS    linker flags for GTK, overriding pkg-config
   SNDFILE_CFLAGS
               C compiler flags for SNDFILE, overriding pkg-config
   SNDFILE_LIBS
@@ -1592,6 +1589,7 @@ Some influential environment variables:
   mpg123_CFLAGS
               C compiler flags for mpg123, overriding pkg-config
   mpg123_LIBS linker flags for mpg123, overriding pkg-config
+  CPP         C preprocessor
   CMOCKA_CFLAGS
               C compiler flags for CMOCKA, overriding pkg-config
   CMOCKA_LIBS linker flags for CMOCKA, overriding pkg-config
@@ -17448,6 +17446,2506 @@ fi
 done
 
 
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for cos in -lm" >&5
+printf %s "checking for cos in -lm... " >&6; }
+if test ${ac_cv_lib_m_cos+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lm  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cos (void);
+int
+main (void)
+{
+return cos ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_m_cos=yes
+else case e in #(
+  e) ac_cv_lib_m_cos=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_cos" >&5
+printf '%s\n' "$ac_cv_lib_m_cos" >&6; }
+if test "x$ac_cv_lib_m_cos" = xyes
+then :
+  USE_LIBM="-lm"
+fi
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for cos in -lffm" >&5
+printf %s "checking for cos in -lffm... " >&6; }
+if test ${ac_cv_lib_ffm_cos+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lffm  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cos (void);
+int
+main (void)
+{
+return cos ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_ffm_cos=yes
+else case e in #(
+  e) ac_cv_lib_ffm_cos=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ffm_cos" >&5
+printf '%s\n' "$ac_cv_lib_ffm_cos" >&6; }
+if test "x$ac_cv_lib_ffm_cos" = xyes
+then :
+  USE_LIBM="-lffm -lm"
+fi
+
+# Check whether --enable-cpml was given.
+if test ${enable_cpml+y}
+then :
+  enableval=$enable_cpml; CONFIG_CPML="no"
+else case e in #(
+  e) CONFIG_CPML="yes" ;;
+esac
+fi
+
+if test "${CONFIG_CPML}" = yes; then
+      { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for cos in -lcpml" >&5
+printf %s "checking for cos in -lcpml... " >&6; }
+if test ${ac_cv_lib_cpml_cos+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcpml  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cos (void);
+int
+main (void)
+{
+return cos ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_cpml_cos=yes
+else case e in #(
+  e) ac_cv_lib_cpml_cos=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cpml_cos" >&5
+printf '%s\n' "$ac_cv_lib_cpml_cos" >&6; }
+if test "x$ac_cv_lib_cpml_cos" = xyes
+then :
+  USE_LIBM="-lcpml"
+fi
+
+fi
+CONFIG_MATH_LIB="${USE_LIBM}"
+
+
+
+pkg_failed=no
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for gtk4 >= 4.10" >&5
+printf %s "checking for gtk4 >= 4.10... " >&6; }
+
+if test -n "$GTK_CFLAGS"; then
+    pkg_cv_GTK_CFLAGS="$GTK_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"gtk4 >= 4.10\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "gtk4 >= 4.10") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_GTK_CFLAGS=`$PKG_CONFIG --cflags "gtk4 >= 4.10" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$GTK_LIBS"; then
+    pkg_cv_GTK_LIBS="$GTK_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"gtk4 >= 4.10\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "gtk4 >= 4.10") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_GTK_LIBS=`$PKG_CONFIG --libs "gtk4 >= 4.10" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+                GTK_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "gtk4 >= 4.10" 2>&1`
+        else
+                GTK_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "gtk4 >= 4.10" 2>&1`
+        fi
+        # Put the nasty error message in config.log where it belongs
+        echo "$GTK_PKG_ERRORS" >&5
+
+        HAVE_GTK="no"
+elif test $pkg_failed = untried; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+        HAVE_GTK="no"
+else
+        GTK_CFLAGS=$pkg_cv_GTK_CFLAGS
+        GTK_LIBS=$pkg_cv_GTK_LIBS
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+        HAVE_GTK="yes"
+fi
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking use of ElectricFence malloc debugging" >&5
+printf %s "checking use of ElectricFence malloc debugging... " >&6; }
+# Check whether --enable-efence was given.
+if test ${enable_efence+y}
+then :
+  enableval=$enable_efence; CONFIG_EFENCE="${enableval}"
+else case e in #(
+  e) CONFIG_EFENCE="no" ;;
+esac
+fi
+
+
+case "${CONFIG_EFENCE}" in
+yes)
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for EF_Print in -lefence" >&5
+printf %s "checking for EF_Print in -lefence... " >&6; }
+if test ${ac_cv_lib_efence_EF_Print+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) ac_check_lib_save_LIBS=$LIBS
+LIBS="-lefence  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.
+   The 'extern "C"' is for builds by C++ compilers;
+   although this is not generally supported in C code supporting it here
+   has little cost and some practical benefit (sr 110532).  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char EF_Print (void);
+int
+main (void)
+{
+return EF_Print ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  ac_cv_lib_efence_EF_Print=yes
+else case e in #(
+  e) ac_cv_lib_efence_EF_Print=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_efence_EF_Print" >&5
+printf '%s\n' "$ac_cv_lib_efence_EF_Print" >&6; }
+if test "x$ac_cv_lib_efence_EF_Print" = xyes
+then :
+  HAVE_EFENCE="-lefence"
+fi
+
+	if test "x${HAVE_EFENCE}" != "x-lefence"; then
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+	else
+		LDADD="${LDADD} ${HAVE_EFENCE}"
+
+printf '%s\n' "#define HAVE_EFENCE 1" >>confdefs.h
+
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_EFENCE}" >&5
+printf '%s\n' "${CONFIG_EFENCE}" >&6; }
+	fi
+	;;
+no)
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_EFENCE}" >&5
+printf '%s\n' "${CONFIG_EFENCE}" >&6; }
+	;;
+*)
+	as_fn_error $? "bad value �${CONFIG_EFENCE}� for efence option" "$LINENO" 5
+	;;
+esac
+
+
+WARNING=
+
+# Check whether --with-fileio was given.
+if test ${with_fileio+y}
+then :
+  withval=$with_fileio; CONFIG_FILEIO="${withval}"
+else case e in #(
+  e) CONFIG_FILEIO="lame" ;;
+esac
+fi
+
+
+if test "${CONFIG_FILEIO}" = "sndfile" ; then
+
+pkg_failed=no
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for sndfile >= 1.0.2" >&5
+printf %s "checking for sndfile >= 1.0.2... " >&6; }
+
+if test -n "$SNDFILE_CFLAGS"; then
+    pkg_cv_SNDFILE_CFLAGS="$SNDFILE_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sndfile >= 1.0.2\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "sndfile >= 1.0.2") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SNDFILE_CFLAGS=`$PKG_CONFIG --cflags "sndfile >= 1.0.2" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$SNDFILE_LIBS"; then
+    pkg_cv_SNDFILE_LIBS="$SNDFILE_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sndfile >= 1.0.2\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "sndfile >= 1.0.2") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_SNDFILE_LIBS=`$PKG_CONFIG --libs "sndfile >= 1.0.2" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+                SNDFILE_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "sndfile >= 1.0.2" 2>&1`
+        else
+                SNDFILE_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "sndfile >= 1.0.2" 2>&1`
+        fi
+        # Put the nasty error message in config.log where it belongs
+        echo "$SNDFILE_PKG_ERRORS" >&5
+
+        HAVE_SNDFILE="no"
+elif test $pkg_failed = untried; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+        HAVE_SNDFILE="no"
+else
+        SNDFILE_CFLAGS=$pkg_cv_SNDFILE_CFLAGS
+        SNDFILE_LIBS=$pkg_cv_SNDFILE_LIBS
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+        HAVE_SNDFILE="yes"
+fi
+fi
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking use of file io" >&5
+printf %s "checking use of file io... " >&6; }
+
+if test "${CONFIG_FILEIO}" = "sndfile" ; then
+  if test "${HAVE_SNDFILE}" = "yes" -o "x${SNDFILE_LIBS}" != "x" \
+    -o "x${SNDFILE_CFLAGS}" != "x"; then
+    SNDFILE_LIBS=`echo ${SNDFILE_LIBS}`
+    SNDFILE_CFLAGS=`echo ${SNDFILE_CFLAGS}`
+
+    if test -n "${SNDFILE_LIBS}" ; then
+      FRONTEND_LDFLAGS="${SNDFILE_LIBS} ${FRONTEND_LDFLAGS}"
+    fi
+    FRONTEND_LDADD="-lsndfile ${FRONTEND_LDADD}"
+
+    if test -n "${SNDFILE_CFLAGS}" ; then
+      INCLUDES="${SNDFILE_CFLAGS} ${INCLUDES}"
+    fi
+
+
+printf '%s\n' "#define LIBSNDFILE 1" >>confdefs.h
+
+  else
+    # default
+    CONFIG_FILEIO="lame"
+    WARNING="${WARNING} Could not find any sndfile lib on system."
+  fi
+else
+  CONFIG_FILEIO="lame"
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_FILEIO}" >&5
+printf '%s\n' "${CONFIG_FILEIO}" >&6; }
+if test "x${WARNING}" != "x" ; then
+  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: $WARNING" >&5
+printf '%s\n' "$as_me: WARNING: $WARNING" >&2;}
+fi
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking use of analyzer hooks" >&5
+printf %s "checking use of analyzer hooks... " >&6; }
+# Check whether --enable-analyzer-hooks was given.
+if test ${enable_analyzer_hooks+y}
+then :
+  enableval=$enable_analyzer_hooks; CONFIG_ANALYZER="${enableval}"
+else case e in #(
+  e) CONFIG_ANALYZER="yes" ;;
+esac
+fi
+
+
+case "${CONFIG_ANALYZER}" in
+yes)
+	;;
+no)
+
+printf '%s\n' "#define NOANALYSIS 1" >>confdefs.h
+
+	;;
+*)
+	as_fn_error $? "bad value �${CONFIG_ANALYZER}� for analyzer-hooks option" "$LINENO" 5
+	;;
+esac
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $CONFIG_ANALYZER" >&5
+printf '%s\n' "$CONFIG_ANALYZER" >&6; }
+
+
+# Check whether --enable-mp3x was given.
+if test ${enable_mp3x+y}
+then :
+  enableval=$enable_mp3x; enable_mp3x="${enableval}"
+else case e in #(
+  e) enable_mp3x=no ;;
+esac
+fi
+
+
+
+pkg_failed=no
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for libmpg123 >= 1.26.0" >&5
+printf %s "checking for libmpg123 >= 1.26.0... " >&6; }
+
+if test -n "$mpg123_CFLAGS"; then
+    pkg_cv_mpg123_CFLAGS="$mpg123_CFLAGS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libmpg123 >= 1.26.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libmpg123 >= 1.26.0") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_mpg123_CFLAGS=`$PKG_CONFIG --cflags "libmpg123 >= 1.26.0" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+if test -n "$mpg123_LIBS"; then
+    pkg_cv_mpg123_LIBS="$mpg123_LIBS"
+ elif test -n "$PKG_CONFIG"; then
+    if test -n "$PKG_CONFIG" && \
+    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libmpg123 >= 1.26.0\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "libmpg123 >= 1.26.0") 2>&5
+  ac_status=$?
+  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_mpg123_LIBS=`$PKG_CONFIG --libs "libmpg123 >= 1.26.0" 2>/dev/null`
+		      test "x$?" != "x0" && pkg_failed=yes
+else
+  pkg_failed=yes
+fi
+ else
+    pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+                mpg123_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libmpg123 >= 1.26.0" 2>&1`
+        else
+                mpg123_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libmpg123 >= 1.26.0" 2>&1`
+        fi
+        # Put the nasty error message in config.log where it belongs
+        echo "$mpg123_PKG_ERRORS" >&5
+
+        HAVE_MPG123="no"
+elif test $pkg_failed = untried; then
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+        HAVE_MPG123="no"
+else
+        mpg123_CFLAGS=$pkg_cv_mpg123_CFLAGS
+        mpg123_LIBS=$pkg_cv_mpg123_LIBS
+        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+        HAVE_MPG123="yes"
+fi
+
+# Check whether --enable-decoder was given.
+if test ${enable_decoder+y}
+then :
+  enableval=$enable_decoder; CONFIG_DECODER="${enableval}"
+else case e in #(
+  e) CONFIG_DECODER="yes" ;;
+esac
+fi
+
+
+if test "x${enable_mp3x}" = "xyes"; then
+	if test "${HAVE_MPG123}" != "yes" || test "${CONFIG_DECODER}" = "no"; then
+		as_fn_error $? "--enable-mp3x requires enabled libmpg123 decoder support (libmpg123 >= 1.26.0)" "$LINENO" 5
+	fi
+fi
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking use of external mpg123 decoder" >&5
+printf %s "checking use of external mpg123 decoder... " >&6; }
+LIB_WITH_DECODER=false
+if test "${HAVE_MPG123}" = "yes" && test "${CONFIG_DECODER}" != "no"; then
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+
+printf '%s\n' "#define HAVE_MPG123 1" >>confdefs.h
+
+
+printf '%s\n' "#define DECODE_ON_THE_FLY 1" >>confdefs.h
+
+	FRONTEND_LDADD="$mpg123_LIBS $FRONTEND_LDADD"
+	LIBMP3LAME_LDADD="$mpg123_LIBS $LIBMP3LAME_LDADD"
+	INCLUDES="$mpg123_CFLAGS $INCLUDES"
+else
+	if test "${CONFIG_DECODER}" = "yes" ; then
+		as_fn_error $? "no, libmpg123 not found" "$LINENO" 5
+	else
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_DECODER}" >&5
+printf '%s\n' "${CONFIG_DECODER}" >&6; }
+	fi
+fi
+ if ${LIB_WITH_DECODER}; then
+  LIB_WITH_DECODER_TRUE=
+  LIB_WITH_DECODER_FALSE='#'
+else
+  LIB_WITH_DECODER_TRUE='#'
+  LIB_WITH_DECODER_FALSE=
+fi
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if the lame frontend should be build" >&5
+printf %s "checking if the lame frontend should be build... " >&6; }
+# Check whether --enable-frontend was given.
+if test ${enable_frontend+y}
+then :
+  enableval=$enable_frontend; WITH_FRONTEND="${enableval}"
+else case e in #(
+  e) WITH_FRONTEND=yes ;;
+esac
+fi
+
+if test "x${WITH_FRONTEND}" = "xyes"; then
+	WITH_FRONTEND=lame${ac_exeext}
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+else
+	WITH_FRONTEND=
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+fi
+
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if mp3x is requested" >&5
+printf %s "checking if mp3x is requested... " >&6; }
+if test "x${enable_mp3x}" = "xyes"; then
+	WITH_MP3X=mp3x${ac_exeext}
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+else
+	WITH_MP3X=
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+fi
+
+if test "x${WITH_MP3X}" != "x" && test "${HAVE_GTK}" = "no"; then
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: can't build mp3x, no GTK installed" >&5
+printf '%s\n' "$as_me: WARNING: can't build mp3x, no GTK installed" >&2;}
+	WITH_MP3X=
+fi
+if test "x${WITH_MP3X}" != "x" && test "x${CONFIG_ANALYZER}" != "xyes"; then
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: can't build mp3x because of disabled analyzer hooks" >&5
+printf '%s\n' "$as_me: WARNING: can't build mp3x because of disabled analyzer hooks" >&2;}
+	WITH_MP3X=
+fi
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if mp3rtp is requested" >&5
+printf %s "checking if mp3rtp is requested... " >&6; }
+# Check whether --enable-mp3rtp was given.
+if test ${enable_mp3rtp+y}
+then :
+  enableval=$enable_mp3rtp; WITH_MP3RTP="${enableval}"
+else case e in #(
+  e) WITH_MP3RTP=no ;;
+esac
+fi
+
+if test "x${WITH_MP3RTP}" = "xyes"; then
+	if test ${SOCKETFUNCTION} = NO; then
+		as_fn_error $? "function socket is mandatory for mp3rtp" "$LINENO" 5
+	fi
+	WITH_MP3RTP=mp3rtp${ac_exeext}
+	MP3RTP_MAN=mp3rtp.1
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+else
+	WITH_MP3RTP=
+	MP3RTP_MAN=
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+fi
+
+FRONTEND_UNICODE_LDFLAGS=
+case "${host_os}" in
+mingw*)
+	if test -n "${WITH_FRONTEND}${WITH_MP3X}${WITH_MP3RTP}"; then
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether ${CC} supports MinGW Unicode startup" >&5
+printf %s "checking whether ${CC} supports MinGW Unicode startup... " >&6; }
+		lame_save_LDFLAGS="${LDFLAGS}"
+		LDFLAGS="${LDFLAGS} -municode"
+		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <wchar.h>
+int wmain(int argc, wchar_t **argv)
+{
+	return argc > 0 && argv != 0 ? 0 : 1;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  FRONTEND_UNICODE_LDFLAGS="-municode"
+else case e in #(
+  e) FRONTEND_UNICODE_LDFLAGS= ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+		LDFLAGS="${lame_save_LDFLAGS}"
+		if test -n "${FRONTEND_UNICODE_LDFLAGS}"; then
+			{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+		else
+			{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+			as_fn_error $? "MinGW frontend programs require compiler support for -municode and wmain" "$LINENO" 5
+		fi
+	fi
+	;;
+esac
+
+#Checking for IPV6 support
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for IPv6 support" >&5
+printf %s "checking for IPv6 support... " >&6; }
+# Check whether --enable-ipv6 was given.
+if test ${enable_ipv6+y}
+then :
+  enableval=$enable_ipv6; CONFIG_IPV6=$enableval
+else case e in #(
+  e) CONFIG_IPV6=yes ;;
+esac
+fi
+
+if test "x$CONFIG_IPV6" = "xyes" ; then
+    if test ${ac_cv_ipv6+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) if test "$cross_compiling" = yes
+then :
+  ac_cv_ipv6=yes
+else case e in #(
+  e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+    #include <sys/types.h>
+    #include <sys/socket.h>
+    #include <netinet/in.h>
+    #include <stdlib.h>
+    main()
+    {
+        int fd;
+        struct sockaddr_in6 foo;
+        fd = socket(AF_INET6, SOCK_STREAM, 0);
+        exit(fd >= 0 ? 0 : 1);
+    }
+_ACEOF
+if ac_fn_c_try_run "$LINENO"
+then :
+  ac_cv_ipv6=yes
+else case e in #(
+  e) ac_cv_ipv6=no ;;
+esac
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext ;;
+esac
+fi
+ ;;
+esac
+fi
+
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_ipv6" >&5
+printf '%s\n' "$ac_cv_ipv6" >&6; }
+    if test $ac_cv_ipv6 = yes ; then
+
+printf '%s\n' "#define IPV6 1" >>confdefs.h
+
+    fi
+else
+    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $CONFIG_IPV6" >&5
+printf '%s\n' "$CONFIG_IPV6" >&6; }
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if dynamic linking of the frontends is requested" >&5
+printf %s "checking if dynamic linking of the frontends is requested... " >&6; }
+# Dynamic linking is the default: it lets the frontends pick up the shared
+# library's optimization (see -fno-semantic-interposition below) and be built
+# as position-independent executables together with the hardening flags.
+# --disable-dynamic-frontends links the frontends statically into a
+# self-contained binary.
+# Check whether --enable-dynamic-frontends was given.
+if test ${enable_dynamic_frontends+y}
+then :
+  enableval=$enable_dynamic_frontends; dynamic_frontends_given=yes
+else case e in #(
+  e) enable_dynamic_frontends=yes ;;
+esac
+fi
+
+if test "x${enable_dynamic_frontends}" = "xno"; then
+	FRONTEND_LDFLAGS="${FRONTEND_LDFLAGS} -static"
+fi
+case "x${FRONTEND_LDFLAGS}" in
+*-static*)
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+	;;
+*)
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf '%s\n' "yes" >&6; }
+	;;
+esac
+
+
+# --enable-internal exposes the internal/developer tuning options in the
+# frontend (--substep, --sfscale, --athcurve, ...). Those setters are
+# deliberately withheld from the shared library's export list
+# (include/libmp3lame.sym), so anything that calls them must link the static
+# archive; enabling the options therefore forces static frontend linking. The
+# options only make sense on an alpha version (LAME_TYPE_VERSION==0) - asking
+# for them on a beta or release tree is an error, not a silent no-op.
+lame_type_version=`sed -n 's/.*LAME_TYPE_VERSION[[:space:]][[:space:]]*\([0-9]\).*/\1/p' "$srcdir/libmp3lame/version.h"`
+# Check whether --enable-internal was given.
+if test ${enable_internal+y}
+then :
+  enableval=$enable_internal; enable_internal="${enableval}"
+else case e in #(
+  e) enable_internal=no ;;
+esac
+fi
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable internal/developer options" >&5
+printf %s "checking whether to enable internal/developer options... " >&6; }
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${enable_internal}" >&5
+printf '%s\n' "${enable_internal}" >&6; }
+internal_static_note=
+if test "x${enable_internal}" = "xyes"; then
+	if test "x${lame_type_version}" != "x0"; then
+		as_fn_error $? "--enable-internal requires an alpha version (LAME_TYPE_VERSION==0); this tree is version type \"${lame_type_version}\". The internal/developer tuning options are not available in beta or release builds." "$LINENO" 5
+	fi
+	if test "x${enable_static}" = "xno"; then
+		as_fn_error $? "--enable-internal needs the static libmp3lame archive, but --disable-static was given. The internal setters are not exported from the shared library, so the frontend must link statically. Re-run without --disable-static." "$LINENO" 5
+	fi
+	# _ALLOW_INTERNAL_OPTIONS is defined per-target (frontend and the set_get
+	# unit test) via the INTERNAL_OPTS automake conditional, NOT globally: a
+	# global define would pull the internal-option code path of parse.c into the
+	# other unit tests that compile parse.c only for its argument helpers, and
+	# they link the shared library where the internal setters are absent.
+	case "x${FRONTEND_LDFLAGS}" in
+	*-static*)
+		: ;; # already static (e.g. --disable-dynamic-frontends)
+	*)
+		FRONTEND_LDFLAGS="${FRONTEND_LDFLAGS} -static"
+		if test "x${dynamic_frontends_given}" = "xyes"; then
+			internal_static_note="static frontend linking forced ON, overriding the requested --enable-dynamic-frontends: the internal setters are not exported from the shared library, so the frontend must link the static archive"
+		else
+			internal_static_note="static frontend linking forced ON (the default is dynamic): the internal setters are not exported from the shared library, so the frontend must link the static archive"
+		fi
+		;;
+	esac
+fi
+ if test "x${enable_internal}" = "xyes"; then
+  INTERNAL_OPTS_TRUE=
+  INTERNAL_OPTS_FALSE='#'
+else
+  INTERNAL_OPTS_TRUE='#'
+  INTERNAL_OPTS_FALSE=
+fi
+
+
+
+#
+# this is from vorbis
+#
+case $host in
+*86-*-linux*)
+	# glibc < 2.1.3 has a serious FP bug in the math inline header
+	# that will cripple Vorbis.  Look to see if the magic FP stack
+	# clobber is missing in the mathinline header, thus indicating
+	# the buggy version
+
+	ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking how to run the C preprocessor" >&5
+printf %s "checking how to run the C preprocessor... " >&6; }
+# On Suns, sometimes $CPP names a directory.
+if test -n "$CPP" && test -d "$CPP"; then
+  CPP=
+fi
+if test -z "$CPP"; then
+  if test ${ac_cv_prog_CPP+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e)     # Double quotes because $CC needs to be expanded
+    for CPP in "$CC -E" "$CC -E -traditional-cpp" cpp /lib/cpp
+    do
+      ac_preproc_ok=false
+for ac_c_preproc_warn_flag in '' yes
+do
+  # Use a header file that comes with gcc, so configuring glibc
+  # with a fresh cross-compiler works.
+  # On the NeXT, cc -E runs the code through the compiler's parser,
+  # not just through cpp. "Syntax error" is here to catch this case.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <limits.h>
+		     Syntax error
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"
+then :
+
+else case e in #(
+  e) # Broken: fails on valid input.
+continue ;;
+esac
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+
+  # OK, works on sane cases.  Now check whether nonexistent headers
+  # can be detected and how.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ac_nonexistent.h>
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"
+then :
+  # Broken: success on invalid input.
+continue
+else case e in #(
+  e) # Passes both tests.
+ac_preproc_ok=:
+break ;;
+esac
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+
+done
+# Because of 'break', _AC_PREPROC_IFELSE's cleaning code was skipped.
+rm -f conftest.i conftest.err conftest.$ac_ext
+if $ac_preproc_ok
+then :
+  break
+fi
+
+    done
+    ac_cv_prog_CPP=$CPP
+   ;;
+esac
+fi
+  CPP=$ac_cv_prog_CPP
+else
+  ac_cv_prog_CPP=$CPP
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $CPP" >&5
+printf '%s\n' "$CPP" >&6; }
+ac_preproc_ok=false
+for ac_c_preproc_warn_flag in '' yes
+do
+  # Use a header file that comes with gcc, so configuring glibc
+  # with a fresh cross-compiler works.
+  # On the NeXT, cc -E runs the code through the compiler's parser,
+  # not just through cpp. "Syntax error" is here to catch this case.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <limits.h>
+		     Syntax error
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"
+then :
+
+else case e in #(
+  e) # Broken: fails on valid input.
+continue ;;
+esac
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+
+  # OK, works on sane cases.  Now check whether nonexistent headers
+  # can be detected and how.
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <ac_nonexistent.h>
+_ACEOF
+if ac_fn_c_try_cpp "$LINENO"
+then :
+  # Broken: success on invalid input.
+continue
+else case e in #(
+  e) # Passes both tests.
+ac_preproc_ok=:
+break ;;
+esac
+fi
+rm -f conftest.err conftest.i conftest.$ac_ext
+
+done
+# Because of 'break', _AC_PREPROC_IFELSE's cleaning code was skipped.
+rm -f conftest.i conftest.err conftest.$ac_ext
+if $ac_preproc_ok
+then :
+
+else case e in #(
+  e) { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: error: in '$ac_pwd':" >&5
+printf '%s\n' "$as_me: error: in '$ac_pwd':" >&2;}
+as_fn_error $? "C preprocessor \"$CPP\" fails sanity check
+See 'config.log' for more details" "$LINENO" 5; } ;;
+esac
+fi
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for egrep -e" >&5
+printf %s "checking for egrep -e... " >&6; }
+if test ${ac_cv_path_EGREP_TRADITIONAL+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e) if test -z "$EGREP_TRADITIONAL"; then
+  ac_path_EGREP_TRADITIONAL_found=false
+  # Loop through the user's path and test for each of PROGNAME-LIST
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH$PATH_SEPARATOR/usr/xpg4/bin
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_prog in grep ggrep
+   do
+    for ac_exec_ext in '' $ac_executable_extensions; do
+      ac_path_EGREP_TRADITIONAL="$as_dir$ac_prog$ac_exec_ext"
+      as_fn_executable_p "$ac_path_EGREP_TRADITIONAL" || continue
+# Check for GNU ac_path_EGREP_TRADITIONAL and select it if it is found.
+  # Check for GNU $ac_path_EGREP_TRADITIONAL
+case `"$ac_path_EGREP_TRADITIONAL" --version 2>&1` in #(
+*GNU*)
+  ac_cv_path_EGREP_TRADITIONAL="$ac_path_EGREP_TRADITIONAL" ac_path_EGREP_TRADITIONAL_found=:;;
+#(
+*)
+  ac_count=0
+  printf %s 0123456789 >"conftest.in"
+  while :
+  do
+    cat "conftest.in" "conftest.in" >"conftest.tmp"
+    mv "conftest.tmp" "conftest.in"
+    cp "conftest.in" "conftest.nl"
+    printf '%s\n' 'EGREP_TRADITIONAL' >> "conftest.nl"
+    "$ac_path_EGREP_TRADITIONAL" -E 'EGR(EP|AC)_TRADITIONAL$' < "conftest.nl" >"conftest.out" 2>/dev/null || break
+    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
+    as_fn_arith $ac_count + 1 && ac_count=$as_val
+    if test $ac_count -gt ${ac_path_EGREP_TRADITIONAL_max-0}; then
+      # Best one so far, save it but keep looking for a better one
+      ac_cv_path_EGREP_TRADITIONAL="$ac_path_EGREP_TRADITIONAL"
+      ac_path_EGREP_TRADITIONAL_max=$ac_count
+    fi
+    # 10*(2^10) chars as input seems more than enough
+    test $ac_count -gt 10 && break
+  done
+  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
+esac
+
+      $ac_path_EGREP_TRADITIONAL_found && break 3
+    done
+  done
+  done
+IFS=$as_save_IFS
+  if test -z "$ac_cv_path_EGREP_TRADITIONAL"; then
+    :
+  fi
+else
+  ac_cv_path_EGREP_TRADITIONAL=$EGREP_TRADITIONAL
+fi
+
+    if test "$ac_cv_path_EGREP_TRADITIONAL"
+then :
+  ac_cv_path_EGREP_TRADITIONAL="$ac_cv_path_EGREP_TRADITIONAL -E"
+else case e in #(
+  e) if test -z "$EGREP_TRADITIONAL"; then
+  ac_path_EGREP_TRADITIONAL_found=false
+  # Loop through the user's path and test for each of PROGNAME-LIST
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH$PATH_SEPARATOR/usr/xpg4/bin
+do
+  IFS=$as_save_IFS
+  case $as_dir in #(((
+    '') as_dir=./ ;;
+    */) ;;
+    *) as_dir=$as_dir/ ;;
+  esac
+    for ac_prog in egrep
+   do
+    for ac_exec_ext in '' $ac_executable_extensions; do
+      ac_path_EGREP_TRADITIONAL="$as_dir$ac_prog$ac_exec_ext"
+      as_fn_executable_p "$ac_path_EGREP_TRADITIONAL" || continue
+# Check for GNU ac_path_EGREP_TRADITIONAL and select it if it is found.
+  # Check for GNU $ac_path_EGREP_TRADITIONAL
+case `"$ac_path_EGREP_TRADITIONAL" --version 2>&1` in #(
+*GNU*)
+  ac_cv_path_EGREP_TRADITIONAL="$ac_path_EGREP_TRADITIONAL" ac_path_EGREP_TRADITIONAL_found=:;;
+#(
+*)
+  ac_count=0
+  printf %s 0123456789 >"conftest.in"
+  while :
+  do
+    cat "conftest.in" "conftest.in" >"conftest.tmp"
+    mv "conftest.tmp" "conftest.in"
+    cp "conftest.in" "conftest.nl"
+    printf '%s\n' 'EGREP_TRADITIONAL' >> "conftest.nl"
+    "$ac_path_EGREP_TRADITIONAL" 'EGR(EP|AC)_TRADITIONAL$' < "conftest.nl" >"conftest.out" 2>/dev/null || break
+    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
+    as_fn_arith $ac_count + 1 && ac_count=$as_val
+    if test $ac_count -gt ${ac_path_EGREP_TRADITIONAL_max-0}; then
+      # Best one so far, save it but keep looking for a better one
+      ac_cv_path_EGREP_TRADITIONAL="$ac_path_EGREP_TRADITIONAL"
+      ac_path_EGREP_TRADITIONAL_max=$ac_count
+    fi
+    # 10*(2^10) chars as input seems more than enough
+    test $ac_count -gt 10 && break
+  done
+  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
+esac
+
+      $ac_path_EGREP_TRADITIONAL_found && break 3
+    done
+  done
+  done
+IFS=$as_save_IFS
+  if test -z "$ac_cv_path_EGREP_TRADITIONAL"; then
+    as_fn_error $? "no acceptable egrep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5
+  fi
+else
+  ac_cv_path_EGREP_TRADITIONAL=$EGREP_TRADITIONAL
+fi
+ ;;
+esac
+fi ;;
+esac
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_EGREP_TRADITIONAL" >&5
+printf '%s\n' "$ac_cv_path_EGREP_TRADITIONAL" >&6; }
+ EGREP_TRADITIONAL=$ac_cv_path_EGREP_TRADITIONAL
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+		#define __LIBC_INTERNAL_MATH_INLINES 1
+	     	#define __OPTIMIZE__
+		#include <math.h>
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP_TRADITIONAL "log10.*fldlg2.*fxch" >/dev/null 2>&1
+then :
+  bad=maybe
+else case e in #(
+  e) bad=no ;;
+esac
+fi
+rm -rf conftest*
+
+
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking glibc mathinline bug" >&5
+printf %s "checking glibc mathinline bug... " >&6; }
+	if test ${bad} = "maybe" ;then
+	      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+				#define __LIBC_INTERNAL_MATH_INLINES 1
+			     	#define __OPTIMIZE__
+				#include <math.h>
+
+_ACEOF
+if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
+  $EGREP_TRADITIONAL "log10.*fldlg2.*fxch.*st\([0123456789]*\)" >/dev/null 2>&1
+then :
+  bad=no
+else case e in #(
+  e) bad=yes ;;
+esac
+fi
+rm -rf conftest*
+
+	fi
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${bad}" >&5
+printf '%s\n' "${bad}" >&6; }
+	if test ${bad} = "yes" ;then
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING:                                                         " >&5
+printf '%s\n' "$as_me: WARNING:                                                         " >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: ********************************************************" >&5
+printf '%s\n' "$as_me: WARNING: ********************************************************" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * The glibc headers on this machine have a serious bug *" >&5
+printf '%s\n' "$as_me: WARNING: * The glibc headers on this machine have a serious bug *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * in /usr/include/bits/mathinline.h  This bug affects  *" >&5
+printf '%s\n' "$as_me: WARNING: * in /usr/include/bits/mathinline.h  This bug affects  *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * all floating point code, not only LAME, but all code *" >&5
+printf '%s\n' "$as_me: WARNING: * all floating point code, not only LAME, but all code *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * built on this machine. Upgrading to glibc 2.1.3 is   *" >&5
+printf '%s\n' "$as_me: WARNING: * built on this machine. Upgrading to glibc 2.1.3 is   *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * strongly urged to correct the problem.               *" >&5
+printf '%s\n' "$as_me: WARNING: * strongly urged to correct the problem.               *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: *Note: that upgrading glibc will not fix any previously*" >&5
+printf '%s\n' "$as_me: WARNING: *Note: that upgrading glibc will not fix any previously*" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * built programs; this is a compile-time bug.          *" >&5
+printf '%s\n' "$as_me: WARNING: * built programs; this is a compile-time bug.          *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * To work around the problem for this build of LAME,   *" >&5
+printf '%s\n' "$as_me: WARNING: * To work around the problem for this build of LAME,   *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * autoconf is disabling all math inlining.  This will  *" >&5
+printf '%s\n' "$as_me: WARNING: * autoconf is disabling all math inlining.  This will  *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * hurt LAME performace but is necessary for LAME to    *" >&5
+printf '%s\n' "$as_me: WARNING: * hurt LAME performace but is necessary for LAME to    *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * work correctly.  Once glibc is upgraded, rerun       *" >&5
+printf '%s\n' "$as_me: WARNING: * work correctly.  Once glibc is upgraded, rerun       *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * configure and make to build with inlining.           *" >&5
+printf '%s\n' "$as_me: WARNING: * configure and make to build with inlining.           *" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: ********************************************************" >&5
+printf '%s\n' "$as_me: WARNING: ********************************************************" >&2;}
+ { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING:                                                         " >&5
+printf '%s\n' "$as_me: WARNING:                                                         " >&2;}
+
+
+printf '%s\n' "#define __NO_MATH_INLINES 1" >>confdefs.h
+
+	fi;;
+esac
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for termcap" >&5
+printf %s "checking for termcap... " >&6; }
+if test "x${HAVE_TERMCAP}" != "x"; then
+  FRONTEND_LDADD="-l${HAVE_TERMCAP} ${FRONTEND_LDADD}"
+
+printf '%s\n' "#define HAVE_TERMCAP 1" >>confdefs.h
+
+  TERMCAP_DEFAULT="yes"
+else
+  TERMCAP_DEFAULT="no"
+fi
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${TERMCAP_DEFAULT}" >&5
+printf '%s\n' "${TERMCAP_DEFAULT}" >&6; }
+
+
+WITH_VECTOR=no
+lame_cpu_x86=no
+case $host_cpu in
+x86_64|amd64)
+	lame_cpu_x86=yes
+
+
+printf '%s\n' "#define USE_FAST_LOG 1" >>confdefs.h
+
+	;;
+*86)
+	lame_cpu_x86=yes
+
+
+printf '%s\n' "#define USE_FAST_LOG 1" >>confdefs.h
+
+	;;
+powerpc)
+	# The following should not get enabled on a G5. HOWTO check for a G5?
+
+printf '%s\n' "#define USE_FAST_LOG 1" >>confdefs.h
+
+	;;
+*)
+	;;
+esac
+
+# The vector decision itself is made further down, once CFLAGS is final -
+# see "vector routines" there. AM_CONDITIONAL and AC_MSG_RESULT for it live
+# with the decision rather than here.
+
+
+#
+# Optimization flags.
+#
+# Probe the compiler for the optimization flags we want and keep only the ones
+# it accepts.
+#
+# --enable-expopt adds extra, less universally beneficial flags on top of the
+# always-on base set.
+#
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for additional optimizations" >&5
+printf %s "checking for additional optimizations... " >&6; }
+# Check whether --enable-expopt was given.
+if test ${enable_expopt+y}
+then :
+  enableval=$enable_expopt; CONFIG_EXPOPT="${enableval}"
+else case e in #(
+  e) CONFIG_EXPOPT="no" ;;
+esac
+fi
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_EXPOPT}" >&5
+printf '%s\n' "${CONFIG_EXPOPT}" >&6; }
+
+# Security hardening is on by default; --disable-hardening opts out.
+# Check whether --enable-hardening was given.
+if test ${enable_hardening+y}
+then :
+  enableval=$enable_hardening;
+else case e in #(
+  e) enable_hardening=yes ;;
+esac
+fi
+
+
+# Machine-specific tuning is opt-in: it can produce binaries that do not run
+# on other CPUs of the same architecture.
+# Check whether --enable-native was given.
+if test ${enable_native+y}
+then :
+  enableval=$enable_native;
+else case e in #(
+  e) enable_native=no ;;
+esac
+fi
+
+
+if test "x$HAVE_GCC" = "xyes" -o "x$HAVE_CLANG" = "xyes"; then
+	OPTIMIZATION=
+	HARDENING_CFLAGS=
+	HARDENING_LDFLAGS=
+	HARDENING_FE_CFLAGS=
+	HARDENING_FE_LDFLAGS=
+
+	# Warnings, and a faster compile pipe where the linker supports it.
+	# (Per the gcc manual, "there is no reason to use -pedantic".)
+	if test "x${with_gnu_ld}" = "xyes"; then
+		CFLAGS="-Wall -pipe ${CFLAGS}"
+	else
+		# some vendor ld's don't like '-pipe'
+		CFLAGS="-Wall ${CFLAGS}"
+	fi
+
+	case "${CONFIG_EXPOPT}" in
+	no|norm|yes)
+		;;
+	*)
+		as_fn_error $? "bad value ${CONFIG_EXPOPT} for --enable-expopt" "$LINENO" 5
+		;;
+	esac
+
+	# Base optimization, always applied.
+	#   -O3                          aggressive optimization
+	#   -fomit-frame-pointer         free a register (implied by -O on most
+	#                                modern targets, useful on older ones)
+	#   -ffast-math                  relax IEEE semantics - LAME's DSP code
+	#                                is validated with this and relies on
+	#                                the speed. It also asserts that no NaN
+	#                                or infinity occurs, so a test for one
+	#                                may be deleted however it is spelled;
+	#                                code validating a caller's floating
+	#                                point data has to survive that
+	#   -fno-semantic-interposition  let the shared libmp3lame inline its
+	#                                own calls instead of going through the
+	#                                PLT (gcc; harmless no-op elsewhere)
+	#
+	# A CFLAGS given on the configure line is placed AFTER these rather than
+	# instead of them (see the CFLAGS assignment further down), so it adds to
+	# the build and overrides only what it actually names: CFLAGS='-g' yields
+	# debug information at -O3, CFLAGS='-O2 -g' yields both at -O2, and either
+	# keeps the arithmetic settings the DSP code is validated with. Suppressing
+	# this block instead, as it once did, meant a single flag on the command
+	# line silently dropped -ffast-math and changed the encoder's output.
+	# Anything here can still be countermanded by naming its opposite, since
+	# the later flag wins.
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -O3" >&5
+printf %s "checking whether $CC accepts -O3... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -O3 -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  OPTIMIZATION="${OPTIMIZATION} -O3"
+fi
+
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fomit-frame-pointer" >&5
+printf %s "checking whether $CC accepts -fomit-frame-pointer... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -fomit-frame-pointer -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  OPTIMIZATION="${OPTIMIZATION} -fomit-frame-pointer"
+fi
+
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -ffast-math" >&5
+printf %s "checking whether $CC accepts -ffast-math... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -ffast-math -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  OPTIMIZATION="${OPTIMIZATION} -ffast-math"
+fi
+
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fno-semantic-interposition" >&5
+printf %s "checking whether $CC accepts -fno-semantic-interposition... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -fno-semantic-interposition -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  OPTIMIZATION="${OPTIMIZATION} -fno-semantic-interposition"
+fi
+
+
+	case "${CONFIG_EXPOPT}" in
+	norm|yes)
+		# extra, experimental optimization
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -funroll-loops" >&5
+printf %s "checking whether $CC accepts -funroll-loops... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -funroll-loops -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  OPTIMIZATION="${OPTIMIZATION} -funroll-loops"
+fi
+
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fschedule-insns2" >&5
+printf %s "checking whether $CC accepts -fschedule-insns2... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -fschedule-insns2 -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  OPTIMIZATION="${OPTIMIZATION} -fschedule-insns2"
+fi
+
+		;;
+	esac
+
+	# --enable-native tuning.
+	if test "x${enable_native}" = "xyes"; then
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -march=native" >&5
+printf %s "checking whether $CC accepts -march=native... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -march=native -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  OPTIMIZATION="${OPTIMIZATION} -march=native"
+fi
+
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -mtune=native" >&5
+printf %s "checking whether $CC accepts -mtune=native... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -mtune=native -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  OPTIMIZATION="${OPTIMIZATION} -mtune=native"
+fi
+
+	fi
+
+	# Security hardening (default on).  Every flag is probed, so any that
+	# the toolchain does not support is simply skipped.
+	if test "x${enable_hardening}" != "xno"; then
+		# Compile-time hardening, applied to the whole build:
+		#   _FORTIFY_SOURCE          runtime checks for common libc buffer
+		#                            overflows (needs optimization, which
+		#                            the probe supplies)
+		#   -fstack-protector-strong stack-smashing canaries
+		#   -fstack-clash-protection guard against stack-clash attacks
+		#   -fcf-protection=full     control-flow integrity (x86 CET)
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2" >&5
+printf %s "checking whether $CC accepts -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  HARDENING_CFLAGS="${HARDENING_CFLAGS} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
+fi
+
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fstack-protector-strong" >&5
+printf %s "checking whether $CC accepts -fstack-protector-strong... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -fstack-protector-strong -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  HARDENING_CFLAGS="${HARDENING_CFLAGS} -fstack-protector-strong"
+fi
+
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fstack-clash-protection" >&5
+printf %s "checking whether $CC accepts -fstack-clash-protection... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -fstack-clash-protection -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  HARDENING_CFLAGS="${HARDENING_CFLAGS} -fstack-clash-protection"
+fi
+
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fcf-protection=full" >&5
+printf %s "checking whether $CC accepts -fcf-protection=full... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -fcf-protection=full -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  HARDENING_CFLAGS="${HARDENING_CFLAGS} -fcf-protection=full"
+fi
+
+
+		# Link-time hardening:
+		#   -z relro / -z now        full RELRO (relocations read-only,
+		#                            resolved at load time)
+		#   -z noexecstack           non-executable stack
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether the linker accepts -Wl,-z,relro" >&5
+printf %s "checking whether the linker accepts -Wl,-z,relro... " >&6; }
+lame_check_flag_save=$LDFLAGS
+LDFLAGS="$LDFLAGS -Wl,-z,relro -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LDFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  HARDENING_LDFLAGS="${HARDENING_LDFLAGS} -Wl,-z,relro"
+fi
+
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether the linker accepts -Wl,-z,now" >&5
+printf %s "checking whether the linker accepts -Wl,-z,now... " >&6; }
+lame_check_flag_save=$LDFLAGS
+LDFLAGS="$LDFLAGS -Wl,-z,now -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LDFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  HARDENING_LDFLAGS="${HARDENING_LDFLAGS} -Wl,-z,now"
+fi
+
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether the linker accepts -Wl,-z,noexecstack" >&5
+printf %s "checking whether the linker accepts -Wl,-z,noexecstack... " >&6; }
+lame_check_flag_save=$LDFLAGS
+LDFLAGS="$LDFLAGS -Wl,-z,noexecstack -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LDFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  HARDENING_LDFLAGS="${HARDENING_LDFLAGS} -Wl,-z,noexecstack"
+fi
+
+
+		# Build the frontend programs as position-independent executables,
+		# but only when they will link against the shared library.  PIE
+		# needs position-independent objects, and the libmp3lame archive
+		# is not built PIC - so both --disable-dynamic-frontends (which
+		# links that archive on purpose) and --disable-shared (which
+		# leaves nothing else to link) have to skip it.  The shared
+		# library itself is already built -fPIC by libtool and needs
+		# nothing here.
+		lame_fe_pie=yes
+		case "x${FRONTEND_LDFLAGS}" in
+		*-static*)
+			lame_fe_pie=no
+			;;
+		esac
+		if test "x${enable_shared}" = "xno"; then
+			lame_fe_pie=no
+		fi
+		if test "x${lame_fe_pie}" = "xyes"; then
+			{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fPIE" >&5
+printf %s "checking whether $CC accepts -fPIE... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -fPIE -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  HARDENING_FE_CFLAGS="${HARDENING_FE_CFLAGS} -fPIE"
+fi
+
+			{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether the linker accepts -fPIE -pie" >&5
+printf %s "checking whether the linker accepts -fPIE -pie... " >&6; }
+lame_check_flag_save=$LDFLAGS
+LDFLAGS="$LDFLAGS -fPIE -pie -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam \
+    conftest$ac_exeext conftest.$ac_ext
+LDFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  HARDENING_FE_LDFLAGS="${HARDENING_FE_LDFLAGS} -fPIE -pie"
+fi
+
+		fi
+
+		CFLAGS="${CFLAGS} ${HARDENING_CFLAGS}"
+		LDFLAGS="${LDFLAGS} ${HARDENING_LDFLAGS}"
+		FRONTEND_CFLAGS="${FRONTEND_CFLAGS} ${HARDENING_FE_CFLAGS}"
+		FRONTEND_LDFLAGS="${FRONTEND_LDFLAGS} ${HARDENING_FE_LDFLAGS}"
+	fi
+fi
+
+
+
+
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for debug options" >&5
+printf %s "checking for debug options... " >&6; }
+# Check whether --enable-debug was given.
+if test ${enable_debug+y}
+then :
+  enableval=$enable_debug; CONFIG_DEBUG="${enableval}"
+else case e in #(
+  e) CONFIG_DEBUG="no" ;;
+esac
+fi
+
+
+if test "x$GCC" = "xyes"; then
+	DEBUG_NORM_OPT="-O -g -Wall"
+	DEBUG_ANOYING="-Wbad-function-cast -Wcast-align \
+		-Wcast-qual -Wchar-subscripts -Wconversion \
+		-Wmissing-prototypes -Wnested-externs -Wpointer-arith \
+		-Wredundant-decls -Wshadow -Wstrict-prototypes \
+		-Wwrite-strings -Winline \
+		-Wformat -Wswitch -Waggregate-return -Wmissing-noreturn \
+		-Wimplicit-int -fno-builtin"
+
+	case "${CONFIG_DEBUG}" in
+	no)
+		;;
+	norm|yes)
+
+printf '%s\n' "#define ABORTFP 1" >>confdefs.h
+
+		OPTIMIZATION="${DEBUG_NORM_OPT}"
+		;;
+	anoying)
+
+printf '%s\n' "#define ABORTFP 1" >>confdefs.h
+
+		OPTIMIZATION="${DEBUG_NORM_OPT} ${DEBUG_ANOYING}"
+		;;
+	alot)
+
+printf '%s\n' "#define ABORTFP 1" >>confdefs.h
+
+
+printf '%s\n' "#define DEBUG 1" >>confdefs.h
+
+		OPTIMIZATION="${DEBUG_NORM_OPT}"
+		;;
+	*)
+		as_fn_error $? "bad value �${CONFIG_DEBUG}� for debug option" "$LINENO" 5
+	esac
+
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_DEBUG}" >&5
+printf '%s\n' "${CONFIG_DEBUG}" >&6; }
+else
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
+printf '%s\n' "no" >&6; }
+fi
+
+
+
+
+##########################################################################
+# LINUX on Digital/Compaq Alpha CPUs
+##########################################################################
+case $host in
+alpha*-*-linux*)
+
+################################################################
+#### Check if 'ccc' is in our path
+################################################################
+if test "`which ccc 2>/dev/null | grep -c ccc`" != "0" ; then
+	# Compaq's C Compiler
+	CC=ccc
+
+################################################################
+#### set 'OPTIMIZATION = -arch host -tune host'
+####              to generate/tune instructions for this machine
+####     'OPTIMIZATION += -migrate -fast -inline speed -unroll 0'
+####              tweak to run as fast as possible :)
+####     'OPTIMIZATION += -w0'
+####              set warning and linking flags
+################################################################
+	OPTIMIZATION="-arch host -tune host"
+	OPTIMIZATION="-migrate -fast -inline speed -unroll 0 $OPTIMIZATION"
+	OPTIMIZATION="-w0 $OPTIMIZATION"
+
+
+################################################################
+#### to debug, uncomment
+################################################################
+	# For Debugging
+	#OPTIMIZATION="-g3 $OPTIMIZATION"
+
+################################################################
+#### define __DECALPHA__ (i was getting re-declaration warnings
+####   in machine.h
+################################################################
+	# Define DEC Alpha
+
+printf '%s\n' "#define __DECALPHA__ 1" >>confdefs.h
+
+fi  #  gcc or ccc?
+;; # alpha
+
+
+##########################################################################
+# SunOS
+##########################################################################
+sparc-*-sunos4*)
+	if test CC = "cc"; then
+		OPTIMIZATION="-O -xCC"
+		MAKEDEP="-xM"
+		# for gcc, use instead:
+		#   CC="gcc"
+		#   OPTIMIZATION="-O"
+		#   MAKEDEP="-M"
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: Please contact lame@lists.sourceforge.net with the output of the configure run and the file config.cache. Thank you for your cooperation." >&5
+printf '%s\n' "$as_me: WARNING: Please contact lame@lists.sourceforge.net with the output of the configure run and the file config.cache. Thank you for your cooperation." >&2;}
+	fi
+;; #SunOS
+
+##########################################################################
+# SGI
+##########################################################################
+*-sgi-irix*)
+	if test CC = "cc"; then
+		OPTIMIZATION="-O3 -woff all"
+	fi
+;; # SGI
+
+##########################################################################
+# Compaq Alpha running Dec Unix (OSF)
+##########################################################################
+alpha*-dec-osf*)
+	if test CC = "cc"; then
+		OPTIMIZATION="-fast -O3 -std -g3 -non_shared"
+	fi
+;; #OSF
+esac
+
+# todo: include the following tests in the case-list
+UNAME=`uname`
+ARCH=`uname -m`
+
+###########################################################################
+# MOSXS (Rhapsody PPC)
+###########################################################################
+if test "$UNAME" = "Rhapsody"; then
+#   CC="cc"   # should be handled already by autoconf
+   MAKEDEP="-make"
+fi
+
+###########################################################################
+# MAC OSX  Darwin PPC
+###########################################################################
+if test "$UNAME" = "Darwin"; then
+   MAKEDEP="-make"
+   CFLAGS="$CFLAGS -fno-common"
+fi
+
+
+##########################################################################
+# OS/2
+##########################################################################
+# Properly installed EMX runtime & development package is a prerequisite.
+# tools I used: make 3.76.1, uname 1.12, sed 2.05, PD-ksh 5.2.13
+#
+##########################################################################
+if test "$UNAME" = "OS/2"; then
+   SHELL=sh
+   #CC=gcc # should already be handled by configure
+
+   # file extension should already be handled by automake (I don't know,
+   # please  give feedback!
+   #FILE_EXTENSION=".exe"
+
+#   FRONTEND_CFLAGS="-Zmtd -Zsysv-signals -Zbin-files $FRONTEND_CFLAGS"
+fi
+
+###########################################################################
+# AmigaOS
+###########################################################################
+# Type 'Make ARCH=PPC' for PowerUP and 'Make ARCH=WOS' for WarpOS
+#
+###########################################################################
+if test "$UNAME" = "AmigaOS" ; then
+	CC="gcc -noixemul"
+	OPTIMIZATION="$OPTIMIZATION -m68020-60 -m68881"
+	MAKEDEP="-MM"
+	if test "$ARCH" = "WOS"; then
+		CC="ppc-amigaos-gcc -warpup"
+		OPTIMIZATION="$OPTIMIZATION -mmultiple -mcpu=603e"
+		AR="ppc-amigaos-ar"
+		RANLIB="ppc-amigaos-ranlib"
+	fi
+	if test "$ARCH",PPC; then
+		CC="ppc-amigaos-gcc"
+		OPTIMIZATION="$OPTIMIZATION -mmultiple -mcpu=603e"
+		AR="ppc-amigaos-ar"
+		RANLIB="ppc-amigaos-ranlib"
+	fi
+fi
+
+
+CFLAGS="${OPTIMIZATION} ${CFLAGS}"
+
+VECTOR_SSE2_FLAGS=
+if test "x${lame_cpu_x86}" = xyes; then
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking working SSE2 intrinsics" >&5
+printf %s "checking working SSE2 intrinsics... " >&6; }
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <xmmintrin.h>
+		  #if defined (__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
+		  #define SSE2_TARGET __attribute__((target("sse2")))
+		  #else
+		  #define SSE2_TARGET
+		  #endif
+		  static float probe_out;
+		  SSE2_TARGET static void probe(void)
+		  {
+		      __m128 v = _mm_set_ps(1.f, 2.f, 3.f, 4.f);
+		      _mm_store_ss(&probe_out, _mm_sqrt_ps(_mm_mul_ps(v, v)));
+		  }
+int
+main (void)
+{
+probe();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_sse2_intrinsics=yes
+else case e in #(
+  e) lame_sse2_intrinsics=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${lame_sse2_intrinsics}" >&5
+printf '%s\n' "${lame_sse2_intrinsics}" >&6; }
+	if test "x${lame_sse2_intrinsics}" = xno; then
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking working SSE2 intrinsics with a per-file SSE2 baseline" >&5
+printf %s "checking working SSE2 intrinsics with a per-file SSE2 baseline... " >&6; }
+		lame_save_CFLAGS=$CFLAGS
+		CFLAGS="$CFLAGS -msse2"
+		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <xmmintrin.h>
+		  #if defined (__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
+		  #define SSE2_TARGET __attribute__((target("sse2")))
+		  #else
+		  #define SSE2_TARGET
+		  #endif
+		  static float probe_out;
+		  SSE2_TARGET static void probe(void)
+		  {
+		      __m128 v = _mm_set_ps(1.f, 2.f, 3.f, 4.f);
+		      _mm_store_ss(&probe_out, _mm_sqrt_ps(_mm_mul_ps(v, v)));
+		  }
+int
+main (void)
+{
+probe();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_sse2_baseline=yes
+else case e in #(
+  e) lame_sse2_baseline=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+		CFLAGS=$lame_save_CFLAGS
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${lame_sse2_baseline}" >&5
+printf '%s\n' "${lame_sse2_baseline}" >&6; }
+		if test "x${lame_sse2_baseline}" = xyes; then
+			lame_sse2_intrinsics=yes
+			VECTOR_SSE2_FLAGS="-msse2"
+		fi
+	fi
+	if test "x${lame_sse2_intrinsics}" = xyes; then
+
+printf '%s\n' "#define HAVE_SSE2_INTRINSICS 1" >>confdefs.h
+
+		WITH_XMM=yes
+		WITH_VECTOR=yes
+	fi
+fi
+
+VECTOR_AVX2_FLAGS=
+if test "x${WITH_XMM}" = xyes; then
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking working AVX2 intrinsics" >&5
+printf %s "checking working AVX2 intrinsics... " >&6; }
+	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <immintrin.h>
+		  #if defined (__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
+		  #define AVX2_TARGET __attribute__((target("avx2")))
+		  #else
+		  #define AVX2_TARGET
+		  #endif
+		  static const float probe_tbl[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+		  static int probe_i;
+		  static float probe_f;
+		  AVX2_TARGET static void probe(void)
+		  {
+		      __m256i i = _mm256_set1_epi32(1);
+		      __m256i m = _mm256_max_epi16(_mm256_packs_epi32(i, i), _mm256_setzero_si256());
+		      probe_i = _mm256_extract_epi16(m, 0);
+		      _mm_store_ss(&probe_f, _mm256_castps256_ps128(_mm256_i32gather_ps(probe_tbl, i, 4)));
+		  }
+int
+main (void)
+{
+probe();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_avx2_intrinsics=yes
+else case e in #(
+  e) lame_avx2_intrinsics=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${lame_avx2_intrinsics}" >&5
+printf '%s\n' "${lame_avx2_intrinsics}" >&6; }
+	if test "x${lame_avx2_intrinsics}" = xno; then
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking working AVX2 intrinsics with a per-file AVX2 baseline" >&5
+printf %s "checking working AVX2 intrinsics with a per-file AVX2 baseline... " >&6; }
+		lame_save_CFLAGS=$CFLAGS
+		CFLAGS="$CFLAGS -mavx2"
+		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <immintrin.h>
+		  #if defined (__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
+		  #define AVX2_TARGET __attribute__((target("avx2")))
+		  #else
+		  #define AVX2_TARGET
+		  #endif
+		  static const float probe_tbl[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
+		  static int probe_i;
+		  static float probe_f;
+		  AVX2_TARGET static void probe(void)
+		  {
+		      __m256i i = _mm256_set1_epi32(1);
+		      __m256i m = _mm256_max_epi16(_mm256_packs_epi32(i, i), _mm256_setzero_si256());
+		      probe_i = _mm256_extract_epi16(m, 0);
+		      _mm_store_ss(&probe_f, _mm256_castps256_ps128(_mm256_i32gather_ps(probe_tbl, i, 4)));
+		  }
+int
+main (void)
+{
+probe();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_avx2_baseline=yes
+else case e in #(
+  e) lame_avx2_baseline=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+		CFLAGS=$lame_save_CFLAGS
+		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${lame_avx2_baseline}" >&5
+printf '%s\n' "${lame_avx2_baseline}" >&6; }
+		if test "x${lame_avx2_baseline}" = xyes; then
+			lame_avx2_intrinsics=yes
+			VECTOR_AVX2_FLAGS="-mavx2"
+		fi
+	fi
+	if test "x${lame_avx2_intrinsics}" = xyes; then
+
+printf '%s\n' "#define HAVE_AVX2_INTRINSICS 1" >>confdefs.h
+
+		WITH_AVX2=yes
+	fi
+fi
+
+
+
+# which vector code do we support to build on this machine?
+ if test "x${WITH_XMM}" = "xyes"; then
+  WITH_XMM_TRUE=
+  WITH_XMM_FALSE='#'
+else
+  WITH_XMM_TRUE='#'
+  WITH_XMM_FALSE=
+fi
+
+ if test "x${WITH_AVX2}" = "xyes"; then
+  WITH_AVX2_TRUE=
+  WITH_AVX2_FALSE='#'
+else
+  WITH_AVX2_TRUE='#'
+  WITH_AVX2_FALSE=
+fi
+
+
+# needs to be defined to link in the internal vector lib
+ if test "x${WITH_VECTOR}" = "xyes"; then
+  WITH_VECTOR_TRUE=
+  WITH_VECTOR_FALSE='#'
+else
+  WITH_VECTOR_TRUE='#'
+  WITH_VECTOR_FALSE=
+fi
+
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if I have to build the internal vector lib" >&5
+printf %s "checking if I have to build the internal vector lib... " >&6; }
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${WITH_VECTOR}" >&5
+printf '%s\n' "${WITH_VECTOR}" >&6; }
+
+if test "x$USE_MAINTAINER_MODE" = xyes; then
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -Wextra" >&5
+printf %s "checking whether $CC accepts -Wextra... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -Wextra -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  CFLAGS="${CFLAGS} -Wextra"
+fi
+
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -Wshadow" >&5
+printf %s "checking whether $CC accepts -Wshadow... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -Wshadow -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  CFLAGS="${CFLAGS} -Wshadow"
+fi
+
+	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -Werror" >&5
+printf %s "checking whether $CC accepts -Werror... " >&6; }
+lame_check_flag_save=$CFLAGS
+CFLAGS="$CFLAGS -O2 -Werror -Werror"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main (void)
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  lame_check_flag_ok=yes
+else case e in #(
+  e) lame_check_flag_ok=no ;;
+esac
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$lame_check_flag_save
+{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
+printf '%s\n' "$lame_check_flag_ok" >&6; }
+if test "x$lame_check_flag_ok" = xyes
+then :
+  CFLAGS="${CFLAGS} -Werror"
+fi
+
+fi
+
+lame_iconv_incs=
+for lame_iconv_opt in ${GTK_CFLAGS} ${mpg123_CFLAGS} ${SNDFILE_CFLAGS}; do
+	case ${lame_iconv_opt} in
+	-I*)
+		case " ${lame_iconv_incs} " in
+		*" ${lame_iconv_opt} "*) ;;
+		*) lame_iconv_incs="${lame_iconv_incs} ${lame_iconv_opt}" ;;
+		esac
+		;;
+	esac
+done
+lame_iconv_libdirs=
+for lame_iconv_opt in ${GTK_LIBS} ${mpg123_LIBS} ${SNDFILE_LIBS}; do
+	case ${lame_iconv_opt} in
+	-L*)
+		case " ${lame_iconv_libdirs} " in
+		*" ${lame_iconv_opt} "*) ;;
+		*) lame_iconv_libdirs="${lame_iconv_libdirs} ${lame_iconv_opt}" ;;
+		esac
+		;;
+	esac
+done
+
+lame_iconv_save_CPPFLAGS="${CPPFLAGS}"
+lame_iconv_save_LDFLAGS="${LDFLAGS}"
+CPPFLAGS="${CPPFLAGS}${lame_iconv_incs}"
+LDFLAGS="${LDFLAGS}${lame_iconv_libdirs}"
+
       if test "X$prefix" = "XNONE"; then
     acl_final_prefix="$ac_default_prefix"
   else
@@ -17762,279 +20260,6 @@ fi
 printf '%s\n' "$gl_cv_host_cpu_c_abi_32bit" >&6; }
 
   HOST_CPU_C_ABI_32BIT="$gl_cv_host_cpu_c_abi_32bit"
-
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking how to run the C preprocessor" >&5
-printf %s "checking how to run the C preprocessor... " >&6; }
-# On Suns, sometimes $CPP names a directory.
-if test -n "$CPP" && test -d "$CPP"; then
-  CPP=
-fi
-if test -z "$CPP"; then
-  if test ${ac_cv_prog_CPP+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e)     # Double quotes because $CC needs to be expanded
-    for CPP in "$CC -E" "$CC -E -traditional-cpp" cpp /lib/cpp
-    do
-      ac_preproc_ok=false
-for ac_c_preproc_warn_flag in '' yes
-do
-  # Use a header file that comes with gcc, so configuring glibc
-  # with a fresh cross-compiler works.
-  # On the NeXT, cc -E runs the code through the compiler's parser,
-  # not just through cpp. "Syntax error" is here to catch this case.
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <limits.h>
-		     Syntax error
-_ACEOF
-if ac_fn_c_try_cpp "$LINENO"
-then :
-
-else case e in #(
-  e) # Broken: fails on valid input.
-continue ;;
-esac
-fi
-rm -f conftest.err conftest.i conftest.$ac_ext
-
-  # OK, works on sane cases.  Now check whether nonexistent headers
-  # can be detected and how.
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <ac_nonexistent.h>
-_ACEOF
-if ac_fn_c_try_cpp "$LINENO"
-then :
-  # Broken: success on invalid input.
-continue
-else case e in #(
-  e) # Passes both tests.
-ac_preproc_ok=:
-break ;;
-esac
-fi
-rm -f conftest.err conftest.i conftest.$ac_ext
-
-done
-# Because of 'break', _AC_PREPROC_IFELSE's cleaning code was skipped.
-rm -f conftest.i conftest.err conftest.$ac_ext
-if $ac_preproc_ok
-then :
-  break
-fi
-
-    done
-    ac_cv_prog_CPP=$CPP
-   ;;
-esac
-fi
-  CPP=$ac_cv_prog_CPP
-else
-  ac_cv_prog_CPP=$CPP
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $CPP" >&5
-printf '%s\n' "$CPP" >&6; }
-ac_preproc_ok=false
-for ac_c_preproc_warn_flag in '' yes
-do
-  # Use a header file that comes with gcc, so configuring glibc
-  # with a fresh cross-compiler works.
-  # On the NeXT, cc -E runs the code through the compiler's parser,
-  # not just through cpp. "Syntax error" is here to catch this case.
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <limits.h>
-		     Syntax error
-_ACEOF
-if ac_fn_c_try_cpp "$LINENO"
-then :
-
-else case e in #(
-  e) # Broken: fails on valid input.
-continue ;;
-esac
-fi
-rm -f conftest.err conftest.i conftest.$ac_ext
-
-  # OK, works on sane cases.  Now check whether nonexistent headers
-  # can be detected and how.
-  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <ac_nonexistent.h>
-_ACEOF
-if ac_fn_c_try_cpp "$LINENO"
-then :
-  # Broken: success on invalid input.
-continue
-else case e in #(
-  e) # Passes both tests.
-ac_preproc_ok=:
-break ;;
-esac
-fi
-rm -f conftest.err conftest.i conftest.$ac_ext
-
-done
-# Because of 'break', _AC_PREPROC_IFELSE's cleaning code was skipped.
-rm -f conftest.i conftest.err conftest.$ac_ext
-if $ac_preproc_ok
-then :
-
-else case e in #(
-  e) { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: error: in '$ac_pwd':" >&5
-printf '%s\n' "$as_me: error: in '$ac_pwd':" >&2;}
-as_fn_error $? "C preprocessor \"$CPP\" fails sanity check
-See 'config.log' for more details" "$LINENO" 5; } ;;
-esac
-fi
-
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for egrep -e" >&5
-printf %s "checking for egrep -e... " >&6; }
-if test ${ac_cv_path_EGREP_TRADITIONAL+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) if test -z "$EGREP_TRADITIONAL"; then
-  ac_path_EGREP_TRADITIONAL_found=false
-  # Loop through the user's path and test for each of PROGNAME-LIST
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH$PATH_SEPARATOR/usr/xpg4/bin
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_prog in grep ggrep
-   do
-    for ac_exec_ext in '' $ac_executable_extensions; do
-      ac_path_EGREP_TRADITIONAL="$as_dir$ac_prog$ac_exec_ext"
-      as_fn_executable_p "$ac_path_EGREP_TRADITIONAL" || continue
-# Check for GNU ac_path_EGREP_TRADITIONAL and select it if it is found.
-  # Check for GNU $ac_path_EGREP_TRADITIONAL
-case `"$ac_path_EGREP_TRADITIONAL" --version 2>&1` in #(
-*GNU*)
-  ac_cv_path_EGREP_TRADITIONAL="$ac_path_EGREP_TRADITIONAL" ac_path_EGREP_TRADITIONAL_found=:;;
-#(
-*)
-  ac_count=0
-  printf %s 0123456789 >"conftest.in"
-  while :
-  do
-    cat "conftest.in" "conftest.in" >"conftest.tmp"
-    mv "conftest.tmp" "conftest.in"
-    cp "conftest.in" "conftest.nl"
-    printf '%s\n' 'EGREP_TRADITIONAL' >> "conftest.nl"
-    "$ac_path_EGREP_TRADITIONAL" -E 'EGR(EP|AC)_TRADITIONAL$' < "conftest.nl" >"conftest.out" 2>/dev/null || break
-    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
-    as_fn_arith $ac_count + 1 && ac_count=$as_val
-    if test $ac_count -gt ${ac_path_EGREP_TRADITIONAL_max-0}; then
-      # Best one so far, save it but keep looking for a better one
-      ac_cv_path_EGREP_TRADITIONAL="$ac_path_EGREP_TRADITIONAL"
-      ac_path_EGREP_TRADITIONAL_max=$ac_count
-    fi
-    # 10*(2^10) chars as input seems more than enough
-    test $ac_count -gt 10 && break
-  done
-  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
-esac
-
-      $ac_path_EGREP_TRADITIONAL_found && break 3
-    done
-  done
-  done
-IFS=$as_save_IFS
-  if test -z "$ac_cv_path_EGREP_TRADITIONAL"; then
-    :
-  fi
-else
-  ac_cv_path_EGREP_TRADITIONAL=$EGREP_TRADITIONAL
-fi
-
-    if test "$ac_cv_path_EGREP_TRADITIONAL"
-then :
-  ac_cv_path_EGREP_TRADITIONAL="$ac_cv_path_EGREP_TRADITIONAL -E"
-else case e in #(
-  e) if test -z "$EGREP_TRADITIONAL"; then
-  ac_path_EGREP_TRADITIONAL_found=false
-  # Loop through the user's path and test for each of PROGNAME-LIST
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH$PATH_SEPARATOR/usr/xpg4/bin
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_prog in egrep
-   do
-    for ac_exec_ext in '' $ac_executable_extensions; do
-      ac_path_EGREP_TRADITIONAL="$as_dir$ac_prog$ac_exec_ext"
-      as_fn_executable_p "$ac_path_EGREP_TRADITIONAL" || continue
-# Check for GNU ac_path_EGREP_TRADITIONAL and select it if it is found.
-  # Check for GNU $ac_path_EGREP_TRADITIONAL
-case `"$ac_path_EGREP_TRADITIONAL" --version 2>&1` in #(
-*GNU*)
-  ac_cv_path_EGREP_TRADITIONAL="$ac_path_EGREP_TRADITIONAL" ac_path_EGREP_TRADITIONAL_found=:;;
-#(
-*)
-  ac_count=0
-  printf %s 0123456789 >"conftest.in"
-  while :
-  do
-    cat "conftest.in" "conftest.in" >"conftest.tmp"
-    mv "conftest.tmp" "conftest.in"
-    cp "conftest.in" "conftest.nl"
-    printf '%s\n' 'EGREP_TRADITIONAL' >> "conftest.nl"
-    "$ac_path_EGREP_TRADITIONAL" 'EGR(EP|AC)_TRADITIONAL$' < "conftest.nl" >"conftest.out" 2>/dev/null || break
-    diff "conftest.out" "conftest.nl" >/dev/null 2>&1 || break
-    as_fn_arith $ac_count + 1 && ac_count=$as_val
-    if test $ac_count -gt ${ac_path_EGREP_TRADITIONAL_max-0}; then
-      # Best one so far, save it but keep looking for a better one
-      ac_cv_path_EGREP_TRADITIONAL="$ac_path_EGREP_TRADITIONAL"
-      ac_path_EGREP_TRADITIONAL_max=$ac_count
-    fi
-    # 10*(2^10) chars as input seems more than enough
-    test $ac_count -gt 10 && break
-  done
-  rm -f conftest.in conftest.tmp conftest.nl conftest.out;;
-esac
-
-      $ac_path_EGREP_TRADITIONAL_found && break 3
-    done
-  done
-  done
-IFS=$as_save_IFS
-  if test -z "$ac_cv_path_EGREP_TRADITIONAL"; then
-    as_fn_error $? "no acceptable egrep could be found in $PATH$PATH_SEPARATOR/usr/xpg4/bin" "$LINENO" 5
-  fi
-else
-  ac_cv_path_EGREP_TRADITIONAL=$EGREP_TRADITIONAL
-fi
- ;;
-esac
-fi ;;
-esac
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_path_EGREP_TRADITIONAL" >&5
-printf '%s\n' "$ac_cv_path_EGREP_TRADITIONAL" >&6; }
- EGREP_TRADITIONAL=$ac_cv_path_EGREP_TRADITIONAL
 
 
 
@@ -19073,2390 +21298,23 @@ printf '%s\n' "#define ICONV_CONST $iconv_arg1" >>confdefs.h
     fi
   fi
 
+CPPFLAGS="${lame_iconv_save_CPPFLAGS}"
+LDFLAGS="${lame_iconv_save_LDFLAGS}"
 
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for cos in -lm" >&5
-printf %s "checking for cos in -lm... " >&6; }
-if test ${ac_cv_lib_m_cos+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lm  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.
-   The 'extern "C"' is for builds by C++ compilers;
-   although this is not generally supported in C code supporting it here
-   has little cost and some practical benefit (sr 110532).  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char cos (void);
-int
-main (void)
-{
-return cos ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_m_cos=yes
-else case e in #(
-  e) ac_cv_lib_m_cos=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS ;;
-esac
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_cos" >&5
-printf '%s\n' "$ac_cv_lib_m_cos" >&6; }
-if test "x$ac_cv_lib_m_cos" = xyes
-then :
-  USE_LIBM="-lm"
-fi
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for cos in -lffm" >&5
-printf %s "checking for cos in -lffm... " >&6; }
-if test ${ac_cv_lib_ffm_cos+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lffm  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.
-   The 'extern "C"' is for builds by C++ compilers;
-   although this is not generally supported in C code supporting it here
-   has little cost and some practical benefit (sr 110532).  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char cos (void);
-int
-main (void)
-{
-return cos ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_ffm_cos=yes
-else case e in #(
-  e) ac_cv_lib_ffm_cos=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS ;;
-esac
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_ffm_cos" >&5
-printf '%s\n' "$ac_cv_lib_ffm_cos" >&6; }
-if test "x$ac_cv_lib_ffm_cos" = xyes
-then :
-  USE_LIBM="-lffm -lm"
-fi
-
-# Check whether --enable-cpml was given.
-if test ${enable_cpml+y}
-then :
-  enableval=$enable_cpml; CONFIG_CPML="no"
-else case e in #(
-  e) CONFIG_CPML="yes" ;;
-esac
-fi
-
-if test "${CONFIG_CPML}" = yes; then
-      { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for cos in -lcpml" >&5
-printf %s "checking for cos in -lcpml... " >&6; }
-if test ${ac_cv_lib_cpml_cos+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcpml  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.
-   The 'extern "C"' is for builds by C++ compilers;
-   although this is not generally supported in C code supporting it here
-   has little cost and some practical benefit (sr 110532).  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char cos (void);
-int
-main (void)
-{
-return cos ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_cpml_cos=yes
-else case e in #(
-  e) ac_cv_lib_cpml_cos=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS ;;
-esac
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cpml_cos" >&5
-printf '%s\n' "$ac_cv_lib_cpml_cos" >&6; }
-if test "x$ac_cv_lib_cpml_cos" = xyes
-then :
-  USE_LIBM="-lcpml"
-fi
-
-fi
-CONFIG_MATH_LIB="${USE_LIBM}"
-
-
-
-# Check whether --with-gtk-prefix was given.
-if test ${with_gtk_prefix+y}
-then :
-  withval=$with_gtk_prefix; gtk_config_prefix="$withval"
-else case e in #(
-  e) gtk_config_prefix="" ;;
-esac
-fi
-
-
-# Check whether --with-gtk-exec-prefix was given.
-if test ${with_gtk_exec_prefix+y}
-then :
-  withval=$with_gtk_exec_prefix; gtk_config_exec_prefix="$withval"
-else case e in #(
-  e) gtk_config_exec_prefix="" ;;
-esac
-fi
-
-# Check whether --enable-gtktest was given.
-if test ${enable_gtktest+y}
-then :
-  enableval=$enable_gtktest;
-else case e in #(
-  e) enable_gtktest=yes ;;
-esac
-fi
-
-
-  for module in .
-  do
-      case "$module" in
-         gthread)
-             gtk_config_args="$gtk_config_args gthread"
-         ;;
-      esac
-  done
-
-  if test x$gtk_config_exec_prefix != x ; then
-     gtk_config_args="$gtk_config_args --exec-prefix=$gtk_config_exec_prefix"
-     if test x${GTK_CONFIG+set} != xset ; then
-        GTK_CONFIG=$gtk_config_exec_prefix/bin/gtk-config
-     fi
-  fi
-  if test x$gtk_config_prefix != x ; then
-     gtk_config_args="$gtk_config_args --prefix=$gtk_config_prefix"
-     if test x${GTK_CONFIG+set} != xset ; then
-        GTK_CONFIG=$gtk_config_prefix/bin/gtk-config
-     fi
-  fi
-
-  # Extract the first word of "gtk-config", so it can be a program name with args.
-set dummy gtk-config; ac_word=$2
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
-printf %s "checking for $ac_word... " >&6; }
-if test ${ac_cv_path_GTK_CONFIG+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) case $GTK_CONFIG in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_GTK_CONFIG="$GTK_CONFIG" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  case $as_dir in #(((
-    '') as_dir=./ ;;
-    */) ;;
-    *) as_dir=$as_dir/ ;;
-  esac
-    for ac_exec_ext in '' $ac_executable_extensions; do
-  if as_fn_executable_p "$as_dir$ac_word$ac_exec_ext"; then
-    ac_cv_path_GTK_CONFIG="$as_dir$ac_word$ac_exec_ext"
-    printf '%s\n' "$as_me:${as_lineno-$LINENO}: found $as_dir$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-  done
-IFS=$as_save_IFS
-
-  test -z "$ac_cv_path_GTK_CONFIG" && ac_cv_path_GTK_CONFIG="no"
-  ;;
-esac ;;
-esac
-fi
-GTK_CONFIG=$ac_cv_path_GTK_CONFIG
-if test -n "$GTK_CONFIG"; then
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $GTK_CONFIG" >&5
-printf '%s\n' "$GTK_CONFIG" >&6; }
-else
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-fi
-
-
-  min_gtk_version=1.2.0
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for GTK - version >= $min_gtk_version" >&5
-printf %s "checking for GTK - version >= $min_gtk_version... " >&6; }
-  no_gtk=""
-  if test "$GTK_CONFIG" = "no" ; then
-    no_gtk=yes
-  else
-    GTK_CFLAGS=`$GTK_CONFIG $gtk_config_args --cflags`
-    GTK_LIBS=`$GTK_CONFIG $gtk_config_args --libs`
-    gtk_config_major_version=`$GTK_CONFIG $gtk_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\1/'`
-    gtk_config_minor_version=`$GTK_CONFIG $gtk_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\2/'`
-    gtk_config_micro_version=`$GTK_CONFIG $gtk_config_args --version | \
-           sed 's/\([0-9]*\).\([0-9]*\).\([0-9]*\)/\3/'`
-    if test "x$enable_gtktest" = "xyes" ; then
-      ac_save_CFLAGS="$CFLAGS"
-      ac_save_LIBS="$LIBS"
-      CFLAGS="$CFLAGS $GTK_CFLAGS"
-      LIBS="$GTK_LIBS $LIBS"
-      rm -f conf.gtktest
-      if test "$cross_compiling" = yes
-then :
-  echo $ac_n "cross compiling; assumed OK... $ac_c"
-else case e in #(
-  e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <gtk/gtk.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-int
-main ()
-{
-  int major, minor, micro;
-  char *tmp_version;
-
-  system ("touch conf.gtktest");
-
-  /* HP/UX 9 (%@#!) writes to sscanf strings */
-  tmp_version = g_strdup("$min_gtk_version");
-  if (sscanf(tmp_version, "%d.%d.%d", &major, &minor, &micro) != 3) {
-     printf("%s, bad version string\n", "$min_gtk_version");
-     exit(1);
-   }
-
-  if ((gtk_major_version != $gtk_config_major_version) ||
-      (gtk_minor_version != $gtk_config_minor_version) ||
-      (gtk_micro_version != $gtk_config_micro_version))
-    {
-      printf("\n*** 'gtk-config --version' returned %d.%d.%d, but GTK+ (%d.%d.%d)\n",
-             $gtk_config_major_version, $gtk_config_minor_version, $gtk_config_micro_version,
-             gtk_major_version, gtk_minor_version, gtk_micro_version);
-      printf ("*** was found! If gtk-config was correct, then it is best\n");
-      printf ("*** to remove the old version of GTK+. You may also be able to fix the error\n");
-      printf("*** by modifying your LD_LIBRARY_PATH enviroment variable, or by editing\n");
-      printf("*** /etc/ld.so.conf. Make sure you have run ldconfig if that is\n");
-      printf("*** required on your system.\n");
-      printf("*** If gtk-config was wrong, set the environment variable GTK_CONFIG\n");
-      printf("*** to point to the correct copy of gtk-config, and remove the file config.cache\n");
-      printf("*** before re-running configure\n");
-    }
-#if defined (GTK_MAJOR_VERSION) && defined (GTK_MINOR_VERSION) && defined (GTK_MICRO_VERSION)
-  else if ((gtk_major_version != GTK_MAJOR_VERSION) ||
-     (gtk_minor_version != GTK_MINOR_VERSION) ||
-           (gtk_micro_version != GTK_MICRO_VERSION))
-    {
-      printf("*** GTK+ header files (version %d.%d.%d) do not match\n",
-       GTK_MAJOR_VERSION, GTK_MINOR_VERSION, GTK_MICRO_VERSION);
-      printf("*** library (version %d.%d.%d)\n",
-       gtk_major_version, gtk_minor_version, gtk_micro_version);
-    }
-#endif /* defined (GTK_MAJOR_VERSION) ... */
-  else
-    {
-      if ((gtk_major_version > major) ||
-        ((gtk_major_version == major) && (gtk_minor_version > minor)) ||
-        ((gtk_major_version == major) && (gtk_minor_version == minor) && (gtk_micro_version >= micro)))
-      {
-        return 0;
-       }
-     else
-      {
-        printf("\n*** An old version of GTK+ (%d.%d.%d) was found.\n",
-               gtk_major_version, gtk_minor_version, gtk_micro_version);
-        printf("*** You need a version of GTK+ newer than %d.%d.%d. The latest version of\n",
-         major, minor, micro);
-        printf("*** GTK+ is always available from ftp://ftp.gtk.org.\n");
-        printf("***\n");
-        printf("*** If you have already installed a sufficiently new version, this error\n");
-        printf("*** probably means that the wrong copy of the gtk-config shell script is\n");
-        printf("*** being found. The easiest way to fix this is to remove the old version\n");
-        printf("*** of GTK+, but you can also set the GTK_CONFIG environment to point to the\n");
-        printf("*** correct copy of gtk-config. (In this case, you will have to\n");
-        printf("*** modify your LD_LIBRARY_PATH enviroment variable, or edit /etc/ld.so.conf\n");
-        printf("*** so that the correct libraries are found at run-time))\n");
-      }
-    }
-  return 1;
-}
-
-_ACEOF
-if ac_fn_c_try_run "$LINENO"
-then :
-
-else case e in #(
-  e) no_gtk=yes ;;
-esac
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext ;;
-esac
-fi
-
-       CFLAGS="$ac_save_CFLAGS"
-       LIBS="$ac_save_LIBS"
-     fi
-  fi
-  if test "x$no_gtk" = x ; then
-     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
-     HAVE_GTK="yes"
-  else
-     { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-     if test "$GTK_CONFIG" = "no" ; then
-       echo "*** The gtk-config script installed by GTK could not be found"
-       echo "*** If GTK was installed in PREFIX, make sure PREFIX/bin is in"
-       echo "*** your path, or set the GTK_CONFIG environment variable to the"
-       echo "*** full path to gtk-config."
-     else
-       if test -f conf.gtktest ; then
-        :
-       else
-          echo "*** Could not run GTK test program, checking why..."
-          CFLAGS="$CFLAGS $GTK_CFLAGS"
-          LIBS="$LIBS $GTK_LIBS"
-          cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include <gtk/gtk.h>
-#include <stdio.h>
-
-int
-main (void)
-{
- return ((gtk_major_version) || (gtk_minor_version) || (gtk_micro_version));
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-   echo "*** The test program compiled, but did not run. This usually means"
-          echo "*** that the run-time linker is not finding GTK or finding the wrong"
-          echo "*** version of GTK. If it is not finding GTK, you'll need to set your"
-          echo "*** LD_LIBRARY_PATH environment variable, or edit /etc/ld.so.conf to point"
-          echo "*** to the installed location  Also, make sure you have run ldconfig if that"
-          echo "*** is required on your system"
-    echo "***"
-          echo "*** If you have an old version installed, it is best to remove it, although"
-          echo "*** you may also be able to get things to work by modifying LD_LIBRARY_PATH"
-          echo "***"
-          echo "*** If you have a RedHat 5.0 system, you should remove the GTK package that"
-          echo "*** came with the system with the command"
-          echo "***"
-          echo "***    rpm --erase --nodeps gtk gtk-devel"
-else case e in #(
-  e)  echo "*** The test program failed to compile or link. See the file config.log for the"
-          echo "*** exact error that occured. This usually means GTK was incorrectly installed"
-          echo "*** or that you have moved GTK since it was installed. In the latter case, you"
-          echo "*** may want to edit the gtk-config script: $GTK_CONFIG"  ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-          CFLAGS="$ac_save_CFLAGS"
-          LIBS="$ac_save_LIBS"
-       fi
-     fi
-     GTK_CFLAGS=""
-     GTK_LIBS=""
-     HAVE_GTK="no"
-  fi
-
-
-  rm -f conf.gtktest
-
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking use of ElectricFence malloc debugging" >&5
-printf %s "checking use of ElectricFence malloc debugging... " >&6; }
-# Check whether --enable-efence was given.
-if test ${enable_efence+y}
-then :
-  enableval=$enable_efence; CONFIG_EFENCE="${enableval}"
-else case e in #(
-  e) CONFIG_EFENCE="no" ;;
-esac
-fi
-
-
-case "${CONFIG_EFENCE}" in
-yes)
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for EF_Print in -lefence" >&5
-printf %s "checking for EF_Print in -lefence... " >&6; }
-if test ${ac_cv_lib_efence_EF_Print+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) ac_check_lib_save_LIBS=$LIBS
-LIBS="-lefence  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.
-   The 'extern "C"' is for builds by C++ compilers;
-   although this is not generally supported in C code supporting it here
-   has little cost and some practical benefit (sr 110532).  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char EF_Print (void);
-int
-main (void)
-{
-return EF_Print ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  ac_cv_lib_efence_EF_Print=yes
-else case e in #(
-  e) ac_cv_lib_efence_EF_Print=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS ;;
-esac
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_efence_EF_Print" >&5
-printf '%s\n' "$ac_cv_lib_efence_EF_Print" >&6; }
-if test "x$ac_cv_lib_efence_EF_Print" = xyes
-then :
-  HAVE_EFENCE="-lefence"
-fi
-
-	if test "x${HAVE_EFENCE}" != "x-lefence"; then
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
+if test "x${am_func_iconv}" = "xyes"; then
+	if test "x${am_cv_lib_iconv}" = "xyes"; then
+		iconv_state="yes (separate library)"
 	else
-		LDADD="${LDADD} ${HAVE_EFENCE}"
-
-printf '%s\n' "#define HAVE_EFENCE 1" >>confdefs.h
-
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_EFENCE}" >&5
-printf '%s\n' "${CONFIG_EFENCE}" >&6; }
+		iconv_state="yes (C library)"
 	fi
-	;;
-no)
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_EFENCE}" >&5
-printf '%s\n' "${CONFIG_EFENCE}" >&6; }
-	;;
-*)
-	as_fn_error $? "bad value �${CONFIG_EFENCE}� for efence option" "$LINENO" 5
-	;;
-esac
-
-
-WARNING=
-
-# Check whether --with-fileio was given.
-if test ${with_fileio+y}
-then :
-  withval=$with_fileio; CONFIG_FILEIO="${withval}"
-else case e in #(
-  e) CONFIG_FILEIO="lame" ;;
-esac
-fi
-
-
-if test "${CONFIG_FILEIO}" = "sndfile" ; then
-
-pkg_failed=no
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for sndfile >= 1.0.2" >&5
-printf %s "checking for sndfile >= 1.0.2... " >&6; }
-
-if test -n "$SNDFILE_CFLAGS"; then
-    pkg_cv_SNDFILE_CFLAGS="$SNDFILE_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sndfile >= 1.0.2\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "sndfile >= 1.0.2") 2>&5
-  ac_status=$?
-  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_SNDFILE_CFLAGS=`$PKG_CONFIG --cflags "sndfile >= 1.0.2" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
 else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$SNDFILE_LIBS"; then
-    pkg_cv_SNDFILE_LIBS="$SNDFILE_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"sndfile >= 1.0.2\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "sndfile >= 1.0.2") 2>&5
-  ac_status=$?
-  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_SNDFILE_LIBS=`$PKG_CONFIG --libs "sndfile >= 1.0.2" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-                SNDFILE_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "sndfile >= 1.0.2" 2>&1`
-        else
-                SNDFILE_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "sndfile >= 1.0.2" 2>&1`
-        fi
-        # Put the nasty error message in config.log where it belongs
-        echo "$SNDFILE_PKG_ERRORS" >&5
-
-        HAVE_SNDFILE="no"
-elif test $pkg_failed = untried; then
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-        HAVE_SNDFILE="no"
-else
-        SNDFILE_CFLAGS=$pkg_cv_SNDFILE_CFLAGS
-        SNDFILE_LIBS=$pkg_cv_SNDFILE_LIBS
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
-        HAVE_SNDFILE="yes"
-fi
-fi
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking use of file io" >&5
-printf %s "checking use of file io... " >&6; }
-
-if test "${CONFIG_FILEIO}" = "sndfile" ; then
-  if test "${HAVE_SNDFILE}" = "yes" -o "x${SNDFILE_LIBS}" != "x" \
-    -o "x${SNDFILE_CFLAGS}" != "x"; then
-    SNDFILE_LIBS=`echo ${SNDFILE_LIBS}`
-    SNDFILE_CFLAGS=`echo ${SNDFILE_CFLAGS}`
-
-    if test -n "${SNDFILE_LIBS}" ; then
-      FRONTEND_LDFLAGS="${SNDFILE_LIBS} ${FRONTEND_LDFLAGS}"
-    fi
-    FRONTEND_LDADD="-lsndfile ${FRONTEND_LDADD}"
-
-    if test -n "${SNDFILE_CFLAGS}" ; then
-      INCLUDES="${SNDFILE_CFLAGS} ${INCLUDES}"
-    fi
-
-
-printf '%s\n' "#define LIBSNDFILE 1" >>confdefs.h
-
-  else
-    # default
-    CONFIG_FILEIO="lame"
-    WARNING="${WARNING} Could not find any sndfile lib on system."
-  fi
-else
-  CONFIG_FILEIO="lame"
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_FILEIO}" >&5
-printf '%s\n' "${CONFIG_FILEIO}" >&6; }
-if test "x${WARNING}" != "x" ; then
-  { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: $WARNING" >&5
-printf '%s\n' "$as_me: WARNING: $WARNING" >&2;}
-fi
-
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking use of analyzer hooks" >&5
-printf %s "checking use of analyzer hooks... " >&6; }
-# Check whether --enable-analyzer-hooks was given.
-if test ${enable_analyzer_hooks+y}
-then :
-  enableval=$enable_analyzer_hooks; CONFIG_ANALYZER="${enableval}"
-else case e in #(
-  e) CONFIG_ANALYZER="yes" ;;
-esac
-fi
-
-
-case "${CONFIG_ANALYZER}" in
-yes)
-	;;
-no)
-
-printf '%s\n' "#define NOANALYSIS 1" >>confdefs.h
-
-	;;
-*)
-	as_fn_error $? "bad value �${CONFIG_ANALYZER}� for analyzer-hooks option" "$LINENO" 5
-	;;
-esac
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $CONFIG_ANALYZER" >&5
-printf '%s\n' "$CONFIG_ANALYZER" >&6; }
-
-
-
-pkg_failed=no
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for libmpg123 >= 1.26.0" >&5
-printf %s "checking for libmpg123 >= 1.26.0... " >&6; }
-
-if test -n "$mpg123_CFLAGS"; then
-    pkg_cv_mpg123_CFLAGS="$mpg123_CFLAGS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libmpg123 >= 1.26.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libmpg123 >= 1.26.0") 2>&5
-  ac_status=$?
-  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_mpg123_CFLAGS=`$PKG_CONFIG --cflags "libmpg123 >= 1.26.0" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-if test -n "$mpg123_LIBS"; then
-    pkg_cv_mpg123_LIBS="$mpg123_LIBS"
- elif test -n "$PKG_CONFIG"; then
-    if test -n "$PKG_CONFIG" && \
-    { { printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"libmpg123 >= 1.26.0\""; } >&5
-  ($PKG_CONFIG --exists --print-errors "libmpg123 >= 1.26.0") 2>&5
-  ac_status=$?
-  printf '%s\n' "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; then
-  pkg_cv_mpg123_LIBS=`$PKG_CONFIG --libs "libmpg123 >= 1.26.0" 2>/dev/null`
-		      test "x$?" != "x0" && pkg_failed=yes
-else
-  pkg_failed=yes
-fi
- else
-    pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-                mpg123_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "libmpg123 >= 1.26.0" 2>&1`
-        else
-                mpg123_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "libmpg123 >= 1.26.0" 2>&1`
-        fi
-        # Put the nasty error message in config.log where it belongs
-        echo "$mpg123_PKG_ERRORS" >&5
-
-        HAVE_MPG123="no"
-elif test $pkg_failed = untried; then
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-        HAVE_MPG123="no"
-else
-        mpg123_CFLAGS=$pkg_cv_mpg123_CFLAGS
-        mpg123_LIBS=$pkg_cv_mpg123_LIBS
-        { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
-        HAVE_MPG123="yes"
-fi
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking use of external mpg123 decoder" >&5
-printf %s "checking use of external mpg123 decoder... " >&6; }
-# Check whether --enable-decoder was given.
-if test ${enable_decoder+y}
-then :
-  enableval=$enable_decoder; CONFIG_DECODER="${enableval}"
-else case e in #(
-  e) CONFIG_DECODER="yes" ;;
-esac
-fi
-
-
-LIB_WITH_DECODER=false
-if test "${HAVE_MPG123}" = "yes" && test "${CONFIG_DECODER}" != "no"; then
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
-
-printf '%s\n' "#define HAVE_MPG123 1" >>confdefs.h
-
-
-printf '%s\n' "#define DECODE_ON_THE_FLY 1" >>confdefs.h
-
-	FRONTEND_LDADD="$mpg123_LIBS $FRONTEND_LDADD"
-	LIBMP3LAME_LDADD="$mpg123_LIBS $LIBMP3LAME_LDADD"
-	INCLUDES="$mpg123_CFLAGS $INCLUDES"
-else
-	if test "${CONFIG_DECODER}" = "yes" ; then
-		as_fn_error $? "no, libmpg123 not found" "$LINENO" 5
-	else
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_DECODER}" >&5
-printf '%s\n' "${CONFIG_DECODER}" >&6; }
-	fi
-fi
- if ${LIB_WITH_DECODER}; then
-  LIB_WITH_DECODER_TRUE=
-  LIB_WITH_DECODER_FALSE='#'
-else
-  LIB_WITH_DECODER_TRUE='#'
-  LIB_WITH_DECODER_FALSE=
-fi
-
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if the lame frontend should be build" >&5
-printf %s "checking if the lame frontend should be build... " >&6; }
-# Check whether --enable-frontend was given.
-if test ${enable_frontend+y}
-then :
-  enableval=$enable_frontend; WITH_FRONTEND="${enableval}"
-else case e in #(
-  e) WITH_FRONTEND=yes ;;
-esac
-fi
-
-if test "x${WITH_FRONTEND}" = "xyes"; then
-	WITH_FRONTEND=lame${ac_exeext}
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
-else
-	WITH_FRONTEND=
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-fi
-
-
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if mp3x is requested" >&5
-printf %s "checking if mp3x is requested... " >&6; }
-# Check whether --enable-mp3x was given.
-if test ${enable_mp3x+y}
-then :
-  enableval=$enable_mp3x; WITH_MP3X="${enableval}"
-else case e in #(
-  e) WITH_MP3X=no ;;
-esac
-fi
-
-if test "x${WITH_MP3X}" = "xyes"; then
-	WITH_MP3X=mp3x${ac_exeext}
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
-else
-	WITH_MP3X=
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-fi
-
-if test "${HAVE_GTK}" = "no"; then
-	if test "x${WITH_MP3X}" = "xmp3x"; then
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: can't build mp3x" >&5
-printf '%s\n' "$as_me: WARNING: can't build mp3x" >&2;}
-		WITH_MP3X=
-	fi
-	if test "x${CONFIG_ANALYZER}" != "xyes"; then
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: can't build mp3x because of disabled analyzer hooks" >&5
-printf '%s\n' "$as_me: WARNING: can't build mp3x because of disabled analyzer hooks" >&2;}
-		WITH_MP3X=
-	fi
-fi
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if mp3rtp is requested" >&5
-printf %s "checking if mp3rtp is requested... " >&6; }
-# Check whether --enable-mp3rtp was given.
-if test ${enable_mp3rtp+y}
-then :
-  enableval=$enable_mp3rtp; WITH_MP3RTP="${enableval}"
-else case e in #(
-  e) WITH_MP3RTP=no ;;
-esac
-fi
-
-if test "x${WITH_MP3RTP}" = "xyes"; then
-	if test ${SOCKETFUNCTION} = NO; then
-		as_fn_error $? "function socket is mandatory for mp3rtp" "$LINENO" 5
-	fi
-	WITH_MP3RTP=mp3rtp${ac_exeext}
-	MP3RTP_MAN=mp3rtp.1
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
-else
-	WITH_MP3RTP=
-	MP3RTP_MAN=
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-fi
-
-#Checking for IPV6 support
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for IPv6 support" >&5
-printf %s "checking for IPv6 support... " >&6; }
-# Check whether --enable-ipv6 was given.
-if test ${enable_ipv6+y}
-then :
-  enableval=$enable_ipv6; CONFIG_IPV6=$enableval
-else case e in #(
-  e) CONFIG_IPV6=yes ;;
-esac
-fi
-
-if test "x$CONFIG_IPV6" = "xyes" ; then
-    if test ${ac_cv_ipv6+y}
-then :
-  printf %s "(cached) " >&6
-else case e in #(
-  e) if test "$cross_compiling" = yes
-then :
-  ac_cv_ipv6=yes
-else case e in #(
-  e) cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-    #include <sys/types.h>
-    #include <sys/socket.h>
-    #include <netinet/in.h>
-    #include <stdlib.h>
-    main()
-    {
-        int fd;
-        struct sockaddr_in6 foo;
-        fd = socket(AF_INET6, SOCK_STREAM, 0);
-        exit(fd >= 0 ? 0 : 1);
-    }
-_ACEOF
-if ac_fn_c_try_run "$LINENO"
-then :
-  ac_cv_ipv6=yes
-else case e in #(
-  e) ac_cv_ipv6=no ;;
-esac
-fi
-rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
-  conftest.$ac_objext conftest.beam conftest.$ac_ext ;;
-esac
-fi
- ;;
-esac
-fi
-
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $ac_cv_ipv6" >&5
-printf '%s\n' "$ac_cv_ipv6" >&6; }
-    if test $ac_cv_ipv6 = yes ; then
-
-printf '%s\n' "#define IPV6 1" >>confdefs.h
-
-    fi
-else
-    { printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $CONFIG_IPV6" >&5
-printf '%s\n' "$CONFIG_IPV6" >&6; }
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if dynamic linking of the frontends is requested" >&5
-printf %s "checking if dynamic linking of the frontends is requested... " >&6; }
-# Dynamic linking is the default: it lets the frontends pick up the shared
-# library's optimization (see -fno-semantic-interposition below) and be built
-# as position-independent executables together with the hardening flags.
-# --disable-dynamic-frontends links the frontends statically into a
-# self-contained binary.
-# Check whether --enable-dynamic-frontends was given.
-if test ${enable_dynamic_frontends+y}
-then :
-  enableval=$enable_dynamic_frontends; dynamic_frontends_given=yes
-else case e in #(
-  e) enable_dynamic_frontends=yes ;;
-esac
-fi
-
-if test "x${enable_dynamic_frontends}" = "xno"; then
-	FRONTEND_LDFLAGS="${FRONTEND_LDFLAGS} -static"
-fi
-case "x${FRONTEND_LDFLAGS}" in
-*-static*)
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-	;;
-*)
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-printf '%s\n' "yes" >&6; }
-	;;
-esac
-
-
-# --enable-internal exposes the internal/developer tuning options in the
-# frontend (--substep, --sfscale, --athcurve, ...). Those setters are
-# deliberately withheld from the shared library's export list
-# (include/libmp3lame.sym), so anything that calls them must link the static
-# archive; enabling the options therefore forces static frontend linking. The
-# options only make sense on an alpha version (LAME_TYPE_VERSION==0) - asking
-# for them on a beta or release tree is an error, not a silent no-op.
-lame_type_version=`sed -n 's/.*LAME_TYPE_VERSION[[:space:]][[:space:]]*\([0-9]\).*/\1/p' "$srcdir/libmp3lame/version.h"`
-# Check whether --enable-internal was given.
-if test ${enable_internal+y}
-then :
-  enableval=$enable_internal; enable_internal="${enableval}"
-else case e in #(
-  e) enable_internal=no ;;
-esac
-fi
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether to enable internal/developer options" >&5
-printf %s "checking whether to enable internal/developer options... " >&6; }
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${enable_internal}" >&5
-printf '%s\n' "${enable_internal}" >&6; }
-internal_static_note=
-if test "x${enable_internal}" = "xyes"; then
-	if test "x${lame_type_version}" != "x0"; then
-		as_fn_error $? "--enable-internal requires an alpha version (LAME_TYPE_VERSION==0); this tree is version type \"${lame_type_version}\". The internal/developer tuning options are not available in beta or release builds." "$LINENO" 5
-	fi
-	if test "x${enable_static}" = "xno"; then
-		as_fn_error $? "--enable-internal needs the static libmp3lame archive, but --disable-static was given. The internal setters are not exported from the shared library, so the frontend must link statically. Re-run without --disable-static." "$LINENO" 5
-	fi
-	# _ALLOW_INTERNAL_OPTIONS is defined per-target (frontend and the set_get
-	# unit test) via the INTERNAL_OPTS automake conditional, NOT globally: a
-	# global define would pull the internal-option code path of parse.c into the
-	# other unit tests that compile parse.c only for its argument helpers, and
-	# they link the shared library where the internal setters are absent.
-	case "x${FRONTEND_LDFLAGS}" in
-	*-static*)
-		: ;; # already static (e.g. --disable-dynamic-frontends)
-	*)
-		FRONTEND_LDFLAGS="${FRONTEND_LDFLAGS} -static"
-		if test "x${dynamic_frontends_given}" = "xyes"; then
-			internal_static_note="static frontend linking forced ON, overriding the requested --enable-dynamic-frontends: the internal setters are not exported from the shared library, so the frontend must link the static archive"
-		else
-			internal_static_note="static frontend linking forced ON (the default is dynamic): the internal setters are not exported from the shared library, so the frontend must link the static archive"
-		fi
-		;;
-	esac
-fi
- if test "x${enable_internal}" = "xyes"; then
-  INTERNAL_OPTS_TRUE=
-  INTERNAL_OPTS_FALSE='#'
-else
-  INTERNAL_OPTS_TRUE='#'
-  INTERNAL_OPTS_FALSE=
-fi
-
-
-
-#
-# this is from vorbis
-#
-case $host in
-*86-*-linux*)
-	# glibc < 2.1.3 has a serious FP bug in the math inline header
-	# that will cripple Vorbis.  Look to see if the magic FP stack
-	# clobber is missing in the mathinline header, thus indicating
-	# the buggy version
-
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-		#define __LIBC_INTERNAL_MATH_INLINES 1
-	     	#define __OPTIMIZE__
-		#include <math.h>
-
-_ACEOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP_TRADITIONAL "log10.*fldlg2.*fxch" >/dev/null 2>&1
-then :
-  bad=maybe
-else case e in #(
-  e) bad=no ;;
-esac
-fi
-rm -rf conftest*
-
-
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking glibc mathinline bug" >&5
-printf %s "checking glibc mathinline bug... " >&6; }
-	if test ${bad} = "maybe" ;then
-	      cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-				#define __LIBC_INTERNAL_MATH_INLINES 1
-			     	#define __OPTIMIZE__
-				#include <math.h>
-
-_ACEOF
-if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
-  $EGREP_TRADITIONAL "log10.*fldlg2.*fxch.*st\([0123456789]*\)" >/dev/null 2>&1
-then :
-  bad=no
-else case e in #(
-  e) bad=yes ;;
-esac
-fi
-rm -rf conftest*
-
-	fi
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${bad}" >&5
-printf '%s\n' "${bad}" >&6; }
-	if test ${bad} = "yes" ;then
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING:                                                         " >&5
-printf '%s\n' "$as_me: WARNING:                                                         " >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: ********************************************************" >&5
-printf '%s\n' "$as_me: WARNING: ********************************************************" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * The glibc headers on this machine have a serious bug *" >&5
-printf '%s\n' "$as_me: WARNING: * The glibc headers on this machine have a serious bug *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * in /usr/include/bits/mathinline.h  This bug affects  *" >&5
-printf '%s\n' "$as_me: WARNING: * in /usr/include/bits/mathinline.h  This bug affects  *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * all floating point code, not only LAME, but all code *" >&5
-printf '%s\n' "$as_me: WARNING: * all floating point code, not only LAME, but all code *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * built on this machine. Upgrading to glibc 2.1.3 is   *" >&5
-printf '%s\n' "$as_me: WARNING: * built on this machine. Upgrading to glibc 2.1.3 is   *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * strongly urged to correct the problem.               *" >&5
-printf '%s\n' "$as_me: WARNING: * strongly urged to correct the problem.               *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: *Note: that upgrading glibc will not fix any previously*" >&5
-printf '%s\n' "$as_me: WARNING: *Note: that upgrading glibc will not fix any previously*" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * built programs; this is a compile-time bug.          *" >&5
-printf '%s\n' "$as_me: WARNING: * built programs; this is a compile-time bug.          *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * To work around the problem for this build of LAME,   *" >&5
-printf '%s\n' "$as_me: WARNING: * To work around the problem for this build of LAME,   *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * autoconf is disabling all math inlining.  This will  *" >&5
-printf '%s\n' "$as_me: WARNING: * autoconf is disabling all math inlining.  This will  *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * hurt LAME performace but is necessary for LAME to    *" >&5
-printf '%s\n' "$as_me: WARNING: * hurt LAME performace but is necessary for LAME to    *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * work correctly.  Once glibc is upgraded, rerun       *" >&5
-printf '%s\n' "$as_me: WARNING: * work correctly.  Once glibc is upgraded, rerun       *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: * configure and make to build with inlining.           *" >&5
-printf '%s\n' "$as_me: WARNING: * configure and make to build with inlining.           *" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: ********************************************************" >&5
-printf '%s\n' "$as_me: WARNING: ********************************************************" >&2;}
- { printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING:                                                         " >&5
-printf '%s\n' "$as_me: WARNING:                                                         " >&2;}
-
-
-printf '%s\n' "#define __NO_MATH_INLINES 1" >>confdefs.h
-
-	fi;;
-esac
-
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for termcap" >&5
-printf %s "checking for termcap... " >&6; }
-if test "x${HAVE_TERMCAP}" != "x"; then
-  FRONTEND_LDADD="-l${HAVE_TERMCAP} ${FRONTEND_LDADD}"
-
-printf '%s\n' "#define HAVE_TERMCAP 1" >>confdefs.h
-
-  TERMCAP_DEFAULT="yes"
-else
-  TERMCAP_DEFAULT="no"
-fi
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${TERMCAP_DEFAULT}" >&5
-printf '%s\n' "${TERMCAP_DEFAULT}" >&6; }
-
-
-WITH_VECTOR=no
-lame_cpu_x86=no
-case $host_cpu in
-x86_64|amd64)
-	lame_cpu_x86=yes
-
-
-printf '%s\n' "#define USE_FAST_LOG 1" >>confdefs.h
-
-	;;
-*86)
-	lame_cpu_x86=yes
-
-
-printf '%s\n' "#define USE_FAST_LOG 1" >>confdefs.h
-
-	;;
-powerpc)
-	# The following should not get enabled on a G5. HOWTO check for a G5?
-
-printf '%s\n' "#define USE_FAST_LOG 1" >>confdefs.h
-
-	;;
-*)
-	;;
-esac
-
-# The vector decision itself is made further down, once CFLAGS is final -
-# see "vector routines" there. AM_CONDITIONAL and AC_MSG_RESULT for it live
-# with the decision rather than here.
-
-
-#
-# Optimization flags.
-#
-# Probe the compiler for the optimization flags we want and keep only the ones
-# it accepts.
-#
-# --enable-expopt adds extra, less universally beneficial flags on top of the
-# always-on base set.
-#
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for additional optimizations" >&5
-printf %s "checking for additional optimizations... " >&6; }
-# Check whether --enable-expopt was given.
-if test ${enable_expopt+y}
-then :
-  enableval=$enable_expopt; CONFIG_EXPOPT="${enableval}"
-else case e in #(
-  e) CONFIG_EXPOPT="no" ;;
-esac
-fi
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_EXPOPT}" >&5
-printf '%s\n' "${CONFIG_EXPOPT}" >&6; }
-
-# Security hardening is on by default; --disable-hardening opts out.
-# Check whether --enable-hardening was given.
-if test ${enable_hardening+y}
-then :
-  enableval=$enable_hardening;
-else case e in #(
-  e) enable_hardening=yes ;;
-esac
-fi
-
-
-# Machine-specific tuning is opt-in: it can produce binaries that do not run
-# on other CPUs of the same architecture.
-# Check whether --enable-native was given.
-if test ${enable_native+y}
-then :
-  enableval=$enable_native;
-else case e in #(
-  e) enable_native=no ;;
-esac
-fi
-
-
-if test "x$HAVE_GCC" = "xyes" -o "x$HAVE_CLANG" = "xyes"; then
-	OPTIMIZATION=
-	HARDENING_CFLAGS=
-	HARDENING_LDFLAGS=
-	HARDENING_FE_CFLAGS=
-	HARDENING_FE_LDFLAGS=
-
-	# Warnings, and a faster compile pipe where the linker supports it.
-	# (Per the gcc manual, "there is no reason to use -pedantic".)
-	if test "x${with_gnu_ld}" = "xyes"; then
-		CFLAGS="-Wall -pipe ${CFLAGS}"
-	else
-		# some vendor ld's don't like '-pipe'
-		CFLAGS="-Wall ${CFLAGS}"
-	fi
-
-	case "${CONFIG_EXPOPT}" in
-	no|norm|yes)
-		;;
-	*)
-		as_fn_error $? "bad value ${CONFIG_EXPOPT} for --enable-expopt" "$LINENO" 5
-		;;
-	esac
-
-	# Base optimization, always applied.
-	#   -O3                          aggressive optimization
-	#   -fomit-frame-pointer         free a register (implied by -O on most
-	#                                modern targets, useful on older ones)
-	#   -ffast-math                  relax IEEE semantics - LAME's DSP code
-	#                                is validated with this and relies on
-	#                                the speed. It also asserts that no NaN
-	#                                or infinity occurs, so a test for one
-	#                                may be deleted however it is spelled;
-	#                                code validating a caller's floating
-	#                                point data has to survive that
-	#   -fno-semantic-interposition  let the shared libmp3lame inline its
-	#                                own calls instead of going through the
-	#                                PLT (gcc; harmless no-op elsewhere)
-	#
-	# A CFLAGS given on the configure line is placed AFTER these rather than
-	# instead of them (see the CFLAGS assignment further down), so it adds to
-	# the build and overrides only what it actually names: CFLAGS='-g' yields
-	# debug information at -O3, CFLAGS='-O2 -g' yields both at -O2, and either
-	# keeps the arithmetic settings the DSP code is validated with. Suppressing
-	# this block instead, as it once did, meant a single flag on the command
-	# line silently dropped -ffast-math and changed the encoder's output.
-	# Anything here can still be countermanded by naming its opposite, since
-	# the later flag wins.
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -O3" >&5
-printf %s "checking whether $CC accepts -O3... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -O3 -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  OPTIMIZATION="${OPTIMIZATION} -O3"
-fi
-
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fomit-frame-pointer" >&5
-printf %s "checking whether $CC accepts -fomit-frame-pointer... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -fomit-frame-pointer -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  OPTIMIZATION="${OPTIMIZATION} -fomit-frame-pointer"
-fi
-
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -ffast-math" >&5
-printf %s "checking whether $CC accepts -ffast-math... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -ffast-math -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  OPTIMIZATION="${OPTIMIZATION} -ffast-math"
-fi
-
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fno-semantic-interposition" >&5
-printf %s "checking whether $CC accepts -fno-semantic-interposition... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -fno-semantic-interposition -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  OPTIMIZATION="${OPTIMIZATION} -fno-semantic-interposition"
-fi
-
-
-	case "${CONFIG_EXPOPT}" in
-	norm|yes)
-		# extra, experimental optimization
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -funroll-loops" >&5
-printf %s "checking whether $CC accepts -funroll-loops... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -funroll-loops -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  OPTIMIZATION="${OPTIMIZATION} -funroll-loops"
-fi
-
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fschedule-insns2" >&5
-printf %s "checking whether $CC accepts -fschedule-insns2... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -fschedule-insns2 -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  OPTIMIZATION="${OPTIMIZATION} -fschedule-insns2"
-fi
-
-		;;
-	esac
-
-	# --enable-native tuning.
-	if test "x${enable_native}" = "xyes"; then
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -march=native" >&5
-printf %s "checking whether $CC accepts -march=native... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -march=native -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  OPTIMIZATION="${OPTIMIZATION} -march=native"
-fi
-
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -mtune=native" >&5
-printf %s "checking whether $CC accepts -mtune=native... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -mtune=native -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  OPTIMIZATION="${OPTIMIZATION} -mtune=native"
-fi
-
-	fi
-
-	# Security hardening (default on).  Every flag is probed, so any that
-	# the toolchain does not support is simply skipped.
-	if test "x${enable_hardening}" != "xno"; then
-		# Compile-time hardening, applied to the whole build:
-		#   _FORTIFY_SOURCE          runtime checks for common libc buffer
-		#                            overflows (needs optimization, which
-		#                            the probe supplies)
-		#   -fstack-protector-strong stack-smashing canaries
-		#   -fstack-clash-protection guard against stack-clash attacks
-		#   -fcf-protection=full     control-flow integrity (x86 CET)
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2" >&5
-printf %s "checking whether $CC accepts -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  HARDENING_CFLAGS="${HARDENING_CFLAGS} -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
-fi
-
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fstack-protector-strong" >&5
-printf %s "checking whether $CC accepts -fstack-protector-strong... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -fstack-protector-strong -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  HARDENING_CFLAGS="${HARDENING_CFLAGS} -fstack-protector-strong"
-fi
-
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fstack-clash-protection" >&5
-printf %s "checking whether $CC accepts -fstack-clash-protection... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -fstack-clash-protection -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  HARDENING_CFLAGS="${HARDENING_CFLAGS} -fstack-clash-protection"
-fi
-
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fcf-protection=full" >&5
-printf %s "checking whether $CC accepts -fcf-protection=full... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -fcf-protection=full -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  HARDENING_CFLAGS="${HARDENING_CFLAGS} -fcf-protection=full"
-fi
-
-
-		# Link-time hardening:
-		#   -z relro / -z now        full RELRO (relocations read-only,
-		#                            resolved at load time)
-		#   -z noexecstack           non-executable stack
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether the linker accepts -Wl,-z,relro" >&5
-printf %s "checking whether the linker accepts -Wl,-z,relro... " >&6; }
-lame_check_flag_save=$LDFLAGS
-LDFLAGS="$LDFLAGS -Wl,-z,relro -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LDFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  HARDENING_LDFLAGS="${HARDENING_LDFLAGS} -Wl,-z,relro"
-fi
-
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether the linker accepts -Wl,-z,now" >&5
-printf %s "checking whether the linker accepts -Wl,-z,now... " >&6; }
-lame_check_flag_save=$LDFLAGS
-LDFLAGS="$LDFLAGS -Wl,-z,now -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LDFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  HARDENING_LDFLAGS="${HARDENING_LDFLAGS} -Wl,-z,now"
-fi
-
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether the linker accepts -Wl,-z,noexecstack" >&5
-printf %s "checking whether the linker accepts -Wl,-z,noexecstack... " >&6; }
-lame_check_flag_save=$LDFLAGS
-LDFLAGS="$LDFLAGS -Wl,-z,noexecstack -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LDFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  HARDENING_LDFLAGS="${HARDENING_LDFLAGS} -Wl,-z,noexecstack"
-fi
-
-
-		# Build the frontend programs as position-independent executables,
-		# but only when they will link against the shared library.  PIE
-		# needs position-independent objects, and the libmp3lame archive
-		# is not built PIC - so both --disable-dynamic-frontends (which
-		# links that archive on purpose) and --disable-shared (which
-		# leaves nothing else to link) have to skip it.  The shared
-		# library itself is already built -fPIC by libtool and needs
-		# nothing here.
-		lame_fe_pie=yes
-		case "x${FRONTEND_LDFLAGS}" in
-		*-static*)
-			lame_fe_pie=no
-			;;
-		esac
-		if test "x${enable_shared}" = "xno"; then
-			lame_fe_pie=no
-		fi
-		if test "x${lame_fe_pie}" = "xyes"; then
-			{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -fPIE" >&5
-printf %s "checking whether $CC accepts -fPIE... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -fPIE -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  HARDENING_FE_CFLAGS="${HARDENING_FE_CFLAGS} -fPIE"
-fi
-
-			{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether the linker accepts -fPIE -pie" >&5
-printf %s "checking whether the linker accepts -fPIE -pie... " >&6; }
-lame_check_flag_save=$LDFLAGS
-LDFLAGS="$LDFLAGS -fPIE -pie -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LDFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  HARDENING_FE_LDFLAGS="${HARDENING_FE_LDFLAGS} -fPIE -pie"
-fi
-
-		fi
-
-		CFLAGS="${CFLAGS} ${HARDENING_CFLAGS}"
-		LDFLAGS="${LDFLAGS} ${HARDENING_LDFLAGS}"
-		FRONTEND_CFLAGS="${FRONTEND_CFLAGS} ${HARDENING_FE_CFLAGS}"
-		FRONTEND_LDFLAGS="${FRONTEND_LDFLAGS} ${HARDENING_FE_LDFLAGS}"
-	fi
-fi
-
-
-
-
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking for debug options" >&5
-printf %s "checking for debug options... " >&6; }
-# Check whether --enable-debug was given.
-if test ${enable_debug+y}
-then :
-  enableval=$enable_debug; CONFIG_DEBUG="${enableval}"
-else case e in #(
-  e) CONFIG_DEBUG="no" ;;
-esac
-fi
-
-
-if test "x$GCC" = "xyes"; then
-	DEBUG_NORM_OPT="-O -g -Wall"
-	DEBUG_ANOYING="-Wbad-function-cast -Wcast-align \
-		-Wcast-qual -Wchar-subscripts -Wconversion \
-		-Wmissing-prototypes -Wnested-externs -Wpointer-arith \
-		-Wredundant-decls -Wshadow -Wstrict-prototypes \
-		-Wwrite-strings -Winline \
-		-Wformat -Wswitch -Waggregate-return -Wmissing-noreturn \
-		-Wimplicit-int -fno-builtin"
-
-	case "${CONFIG_DEBUG}" in
-	no)
-		;;
-	norm|yes)
-
-printf '%s\n' "#define ABORTFP 1" >>confdefs.h
-
-		OPTIMIZATION="${DEBUG_NORM_OPT}"
-		;;
-	anoying)
-
-printf '%s\n' "#define ABORTFP 1" >>confdefs.h
-
-		OPTIMIZATION="${DEBUG_NORM_OPT} ${DEBUG_ANOYING}"
-		;;
-	alot)
-
-printf '%s\n' "#define ABORTFP 1" >>confdefs.h
-
-
-printf '%s\n' "#define DEBUG 1" >>confdefs.h
-
-		OPTIMIZATION="${DEBUG_NORM_OPT}"
-		;;
-	*)
-		as_fn_error $? "bad value �${CONFIG_DEBUG}� for debug option" "$LINENO" 5
-	esac
-
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${CONFIG_DEBUG}" >&5
-printf '%s\n' "${CONFIG_DEBUG}" >&6; }
-else
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: no" >&5
-printf '%s\n' "no" >&6; }
-fi
-
-
-
-
-##########################################################################
-# LINUX on Digital/Compaq Alpha CPUs
-##########################################################################
-case $host in
-alpha*-*-linux*)
-
-################################################################
-#### Check if 'ccc' is in our path
-################################################################
-if test "`which ccc 2>/dev/null | grep -c ccc`" != "0" ; then
-	# Compaq's C Compiler
-	CC=ccc
-
-################################################################
-#### set 'OPTIMIZATION = -arch host -tune host'
-####              to generate/tune instructions for this machine
-####     'OPTIMIZATION += -migrate -fast -inline speed -unroll 0'
-####              tweak to run as fast as possible :)
-####     'OPTIMIZATION += -w0'
-####              set warning and linking flags
-################################################################
-	OPTIMIZATION="-arch host -tune host"
-	OPTIMIZATION="-migrate -fast -inline speed -unroll 0 $OPTIMIZATION"
-	OPTIMIZATION="-w0 $OPTIMIZATION"
-
-
-################################################################
-#### to debug, uncomment
-################################################################
-	# For Debugging
-	#OPTIMIZATION="-g3 $OPTIMIZATION"
-
-################################################################
-#### define __DECALPHA__ (i was getting re-declaration warnings
-####   in machine.h
-################################################################
-	# Define DEC Alpha
-
-printf '%s\n' "#define __DECALPHA__ 1" >>confdefs.h
-
-fi  #  gcc or ccc?
-;; # alpha
-
-
-##########################################################################
-# SunOS
-##########################################################################
-sparc-*-sunos4*)
-	if test CC = "cc"; then
-		OPTIMIZATION="-O -xCC"
-		MAKEDEP="-xM"
-		# for gcc, use instead:
-		#   CC="gcc"
-		#   OPTIMIZATION="-O"
-		#   MAKEDEP="-M"
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: WARNING: Please contact lame@lists.sourceforge.net with the output of the configure run and the file config.cache. Thank you for your cooperation." >&5
-printf '%s\n' "$as_me: WARNING: Please contact lame@lists.sourceforge.net with the output of the configure run and the file config.cache. Thank you for your cooperation." >&2;}
-	fi
-;; #SunOS
-
-##########################################################################
-# SGI
-##########################################################################
-*-sgi-irix*)
-	if test CC = "cc"; then
-		OPTIMIZATION="-O3 -woff all"
-	fi
-;; # SGI
-
-##########################################################################
-# Compaq Alpha running Dec Unix (OSF)
-##########################################################################
-alpha*-dec-osf*)
-	if test CC = "cc"; then
-		OPTIMIZATION="-fast -O3 -std -g3 -non_shared"
-	fi
-;; #OSF
-esac
-
-# todo: include the following tests in the case-list
-UNAME=`uname`
-ARCH=`uname -m`
-
-###########################################################################
-# MOSXS (Rhapsody PPC)
-###########################################################################
-if test "$UNAME" = "Rhapsody"; then
-#   CC="cc"   # should be handled already by autoconf
-   MAKEDEP="-make"
-fi
-
-###########################################################################
-# MAC OSX  Darwin PPC
-###########################################################################
-if test "$UNAME" = "Darwin"; then
-   MAKEDEP="-make"
-   CFLAGS="$CFLAGS -fno-common"
-fi
-
-
-##########################################################################
-# OS/2
-##########################################################################
-# Properly installed EMX runtime & development package is a prerequisite.
-# tools I used: make 3.76.1, uname 1.12, sed 2.05, PD-ksh 5.2.13
-#
-##########################################################################
-if test "$UNAME" = "OS/2"; then
-   SHELL=sh
-   #CC=gcc # should already be handled by configure
-
-   # file extension should already be handled by automake (I don't know,
-   # please  give feedback!
-   #FILE_EXTENSION=".exe"
-
-# Uncomment & inspect the GTK lines to use MP3x GTK frame analyzer.
-# Properly installed XFree86/devlibs & GTK+ is a prerequisite.
-# The following works for me using Xfree86/OS2 3.3.5 and GTK+ 1.2.3:
-#   AC_DEFINE(HAVE_GTK, 1, have GTK)
-#   AC_DEFINE(__ST_MT_ERRNO__, 1)
-#   INCLUDES="-IC:/XFree86/include/gtk12 -IC:/XFree86/include/glib12 \
-#             -IC:/XFree86/include $INCLUDES"
-#   FRONTEND_LDFLAGS="-LC:/XFree86/lib -lgtk12 -lgdk12 -lgmodule -lglib12 \
-#             -lXext -lX11 -lshm -lbsd -lsocket -lm $FRONTEND_LDFLAGS"
-#   FRONTEND_CFLAGS="-Zmtd -Zsysv-signals -Zbin-files $FRONTEND_CFLAGS"
-fi
-
-###########################################################################
-# AmigaOS
-###########################################################################
-# Type 'Make ARCH=PPC' for PowerUP and 'Make ARCH=WOS' for WarpOS
-#
-###########################################################################
-if test "$UNAME" = "AmigaOS" ; then
-	CC="gcc -noixemul"
-	OPTIMIZATION="$OPTIMIZATION -m68020-60 -m68881"
-	MAKEDEP="-MM"
-	if test "$ARCH" = "WOS"; then
-		CC="ppc-amigaos-gcc -warpup"
-		OPTIMIZATION="$OPTIMIZATION -mmultiple -mcpu=603e"
-		AR="ppc-amigaos-ar"
-		RANLIB="ppc-amigaos-ranlib"
-	fi
-	if test "$ARCH",PPC; then
-		CC="ppc-amigaos-gcc"
-		OPTIMIZATION="$OPTIMIZATION -mmultiple -mcpu=603e"
-		AR="ppc-amigaos-ar"
-		RANLIB="ppc-amigaos-ranlib"
-	fi
-fi
-
-
-CFLAGS="${OPTIMIZATION} ${CFLAGS}"
-
-VECTOR_SSE2_FLAGS=
-if test "x${lame_cpu_x86}" = xyes; then
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking working SSE2 intrinsics" >&5
-printf %s "checking working SSE2 intrinsics... " >&6; }
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <xmmintrin.h>
-		  #if defined (__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
-		  #define SSE2_TARGET __attribute__((target("sse2")))
-		  #else
-		  #define SSE2_TARGET
-		  #endif
-		  static float probe_out;
-		  SSE2_TARGET static void probe(void)
-		  {
-		      __m128 v = _mm_set_ps(1.f, 2.f, 3.f, 4.f);
-		      _mm_store_ss(&probe_out, _mm_sqrt_ps(_mm_mul_ps(v, v)));
-		  }
-int
-main (void)
-{
-probe();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_sse2_intrinsics=yes
-else case e in #(
-  e) lame_sse2_intrinsics=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${lame_sse2_intrinsics}" >&5
-printf '%s\n' "${lame_sse2_intrinsics}" >&6; }
-	if test "x${lame_sse2_intrinsics}" = xno; then
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking working SSE2 intrinsics with a per-file SSE2 baseline" >&5
-printf %s "checking working SSE2 intrinsics with a per-file SSE2 baseline... " >&6; }
-		lame_save_CFLAGS=$CFLAGS
-		CFLAGS="$CFLAGS -msse2"
-		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <xmmintrin.h>
-		  #if defined (__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
-		  #define SSE2_TARGET __attribute__((target("sse2")))
-		  #else
-		  #define SSE2_TARGET
-		  #endif
-		  static float probe_out;
-		  SSE2_TARGET static void probe(void)
-		  {
-		      __m128 v = _mm_set_ps(1.f, 2.f, 3.f, 4.f);
-		      _mm_store_ss(&probe_out, _mm_sqrt_ps(_mm_mul_ps(v, v)));
-		  }
-int
-main (void)
-{
-probe();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_sse2_baseline=yes
-else case e in #(
-  e) lame_sse2_baseline=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-		CFLAGS=$lame_save_CFLAGS
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${lame_sse2_baseline}" >&5
-printf '%s\n' "${lame_sse2_baseline}" >&6; }
-		if test "x${lame_sse2_baseline}" = xyes; then
-			lame_sse2_intrinsics=yes
-			VECTOR_SSE2_FLAGS="-msse2"
-		fi
-	fi
-	if test "x${lame_sse2_intrinsics}" = xyes; then
-
-printf '%s\n' "#define HAVE_SSE2_INTRINSICS 1" >>confdefs.h
-
-		WITH_XMM=yes
-		WITH_VECTOR=yes
-	fi
-fi
-
-VECTOR_AVX2_FLAGS=
-if test "x${WITH_XMM}" = xyes; then
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking working AVX2 intrinsics" >&5
-printf %s "checking working AVX2 intrinsics... " >&6; }
-	cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <immintrin.h>
-		  #if defined (__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
-		  #define AVX2_TARGET __attribute__((target("avx2")))
-		  #else
-		  #define AVX2_TARGET
-		  #endif
-		  static const float probe_tbl[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-		  static int probe_i;
-		  static float probe_f;
-		  AVX2_TARGET static void probe(void)
-		  {
-		      __m256i i = _mm256_set1_epi32(1);
-		      __m256i m = _mm256_max_epi16(_mm256_packs_epi32(i, i), _mm256_setzero_si256());
-		      probe_i = _mm256_extract_epi16(m, 0);
-		      _mm_store_ss(&probe_f, _mm256_castps256_ps128(_mm256_i32gather_ps(probe_tbl, i, 4)));
-		  }
-int
-main (void)
-{
-probe();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_avx2_intrinsics=yes
-else case e in #(
-  e) lame_avx2_intrinsics=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${lame_avx2_intrinsics}" >&5
-printf '%s\n' "${lame_avx2_intrinsics}" >&6; }
-	if test "x${lame_avx2_intrinsics}" = xno; then
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking working AVX2 intrinsics with a per-file AVX2 baseline" >&5
-printf %s "checking working AVX2 intrinsics with a per-file AVX2 baseline... " >&6; }
-		lame_save_CFLAGS=$CFLAGS
-		CFLAGS="$CFLAGS -mavx2"
-		cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-#include <immintrin.h>
-		  #if defined (__GNUC__) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ >= 2)))
-		  #define AVX2_TARGET __attribute__((target("avx2")))
-		  #else
-		  #define AVX2_TARGET
-		  #endif
-		  static const float probe_tbl[8] = { 0, 1, 2, 3, 4, 5, 6, 7 };
-		  static int probe_i;
-		  static float probe_f;
-		  AVX2_TARGET static void probe(void)
-		  {
-		      __m256i i = _mm256_set1_epi32(1);
-		      __m256i m = _mm256_max_epi16(_mm256_packs_epi32(i, i), _mm256_setzero_si256());
-		      probe_i = _mm256_extract_epi16(m, 0);
-		      _mm_store_ss(&probe_f, _mm256_castps256_ps128(_mm256_i32gather_ps(probe_tbl, i, 4)));
-		  }
-int
-main (void)
-{
-probe();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_avx2_baseline=yes
-else case e in #(
-  e) lame_avx2_baseline=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-		CFLAGS=$lame_save_CFLAGS
-		{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${lame_avx2_baseline}" >&5
-printf '%s\n' "${lame_avx2_baseline}" >&6; }
-		if test "x${lame_avx2_baseline}" = xyes; then
-			lame_avx2_intrinsics=yes
-			VECTOR_AVX2_FLAGS="-mavx2"
-		fi
-	fi
-	if test "x${lame_avx2_intrinsics}" = xyes; then
-
-printf '%s\n' "#define HAVE_AVX2_INTRINSICS 1" >>confdefs.h
-
-		WITH_AVX2=yes
-	fi
-fi
-
-
-
-# which vector code do we support to build on this machine?
- if test "x${WITH_XMM}" = "xyes"; then
-  WITH_XMM_TRUE=
-  WITH_XMM_FALSE='#'
-else
-  WITH_XMM_TRUE='#'
-  WITH_XMM_FALSE=
-fi
-
- if test "x${WITH_AVX2}" = "xyes"; then
-  WITH_AVX2_TRUE=
-  WITH_AVX2_FALSE='#'
-else
-  WITH_AVX2_TRUE='#'
-  WITH_AVX2_FALSE=
-fi
-
-
-# needs to be defined to link in the internal vector lib
- if test "x${WITH_VECTOR}" = "xyes"; then
-  WITH_VECTOR_TRUE=
-  WITH_VECTOR_FALSE='#'
-else
-  WITH_VECTOR_TRUE='#'
-  WITH_VECTOR_FALSE=
-fi
-
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking if I have to build the internal vector lib" >&5
-printf %s "checking if I have to build the internal vector lib... " >&6; }
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: ${WITH_VECTOR}" >&5
-printf '%s\n' "${WITH_VECTOR}" >&6; }
-
-if test "x$USE_MAINTAINER_MODE" = xyes; then
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -Wextra" >&5
-printf %s "checking whether $CC accepts -Wextra... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -Wextra -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  CFLAGS="${CFLAGS} -Wextra"
-fi
-
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -Wshadow" >&5
-printf %s "checking whether $CC accepts -Wshadow... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -Wshadow -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  CFLAGS="${CFLAGS} -Wshadow"
-fi
-
-	{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: checking whether $CC accepts -Werror" >&5
-printf %s "checking whether $CC accepts -Werror... " >&6; }
-lame_check_flag_save=$CFLAGS
-CFLAGS="$CFLAGS -O2 -Werror -Werror"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-int
-main (void)
-{
-
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  lame_check_flag_ok=yes
-else case e in #(
-  e) lame_check_flag_ok=no ;;
-esac
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$lame_check_flag_save
-{ printf '%s\n' "$as_me:${as_lineno-$LINENO}: result: $lame_check_flag_ok" >&5
-printf '%s\n' "$lame_check_flag_ok" >&6; }
-if test "x$lame_check_flag_ok" = xyes
-then :
-  CFLAGS="${CFLAGS} -Werror"
-fi
-
+	iconv_state="no - tags are not transliterated"
 fi
 
 LDADD="${LDADD}"
 FRONTEND_CFLAGS="${INCICONV} ${FRONTEND_CFLAGS}"
 FRONTEND_LDADD="${FRONTEND_LDADD} ${LTLIBICONV} ${CONFIG_MATH_LIB}"
+
 
 
 
@@ -23970,7 +23828,8 @@ echo "    optional libraries"
 echo "      libmpg123 ........... ${HAVE_MPG123:-no}"
 echo "      libsndfile .......... ${sndfile_state}"
 echo "      terminal library .... ${termcap_state}"
-echo "      GTK 1.2 ............. ${HAVE_GTK:-no}"
+echo "      GTK4 (>= 4.10) ...... ${HAVE_GTK:-no}"
+echo "      iconv ............... ${iconv_state}"
 echo ""
 echo "    programs"
 echo "      lame ................ ${prog_lame}"
