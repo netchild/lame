@@ -1,3 +1,14 @@
+- generate the API documentation into the website working tree first, so that
+  the upload carries the documentation for the release being published. From
+  the LAME source directory:
+    sh maintainer/gen-api-docs.sh
+  It builds the public and the internal set, refuses to copy either one if the
+  run produced no documentation, and writes them to webpages/API/public and
+  webpages/API/internal. The copy is a clean one - what is there is removed
+  first, so a page that no longer exists cannot survive as a stale link target.
+  Review the result, then commit and upload the website as below.
+  See doc/maintainer-gen-api-docs.md; the generated HTML is deliberately not in
+  the tarball, so the website is where the built documentation lives.
 - update the website in SVN (remove --dry-run to really update)
 - assumption: you are in the website directory
 - rsync --dry-run --8-bit-output --human-readable --recursive --links --perms --delete --delete-after --new-compress --info=progress2 -e ssh . $USERNAME@web.sourceforge.net:/home/project-web/lame/htdocs/
