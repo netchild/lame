@@ -47,6 +47,15 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
+/* Define to 1 if you have the 'feenableexcept' function. */
+#undef HAVE_FEENABLEEXCEPT
+
+/* Define to 1 if you have the <fenv.h> header file. */
+#undef HAVE_FENV_H
+
+/* Define to 1 if you have the <fpu_control.h> header file. */
+#undef HAVE_FPU_CONTROL_H
+
 /* Define to 1 if you have the 'getauxval' function. */
 #undef HAVE_GETAUXVAL
 
@@ -186,6 +195,9 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
+/* Define to 1 if you have the <sys/utime.h> header file. */
+#undef HAVE_SYS_UTIME_H
+
 /* have termcap */
 #undef HAVE_TERMCAP
 
@@ -220,6 +232,12 @@
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the 'utime' function. */
+#undef HAVE_UTIME
+
+/* Define to 1 if you have the <utime.h> header file. */
+#undef HAVE_UTIME_H
 
 /* Define to 1 if you have the <wchar.h> header file. */
 #undef HAVE_WCHAR_H

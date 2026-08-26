@@ -113,6 +113,8 @@ host_triplet = @host@
 @ENABLE_UNIT_TESTS_TRUE@	test_free_format$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_encode_api$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_resample_decision$(EXEEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_file_times$(EXEEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_decode_scale$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__EXEEXT_1) $(am__EXEEXT_2) \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__EXEEXT_3)
 
@@ -189,6 +191,16 @@ test_choose_table_vector_OBJECTS =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_5)
+am__test_decode_scale_SOURCES_DIST = test_decode_scale.c
+@ENABLE_UNIT_TESTS_TRUE@am_test_decode_scale_OBJECTS = test_decode_scale-test_decode_scale.$(OBJEXT)
+test_decode_scale_OBJECTS = $(am_test_decode_scale_OBJECTS)
+@ENABLE_UNIT_TESTS_TRUE@test_decode_scale_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
+test_decode_scale_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
+	$(AM_CFLAGS) $(CFLAGS) $(test_decode_scale_LDFLAGS) $(LDFLAGS) \
+	-o $@
 am__test_decoder_api_SOURCES_DIST = test_decoder_api.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_decoder_api_OBJECTS = test_decoder_api-test_decoder_api.$(OBJEXT)
 test_decoder_api_OBJECTS = $(am_test_decoder_api_OBJECTS)
@@ -221,6 +233,13 @@ test_encode_nonfinite_OBJECTS = $(am_test_encode_nonfinite_OBJECTS)
 @ENABLE_UNIT_TESTS_TRUE@test_encode_nonfinite_DEPENDENCIES =  \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
+am__test_file_times_SOURCES_DIST = test_file_times.c \
+	$(top_srcdir)/frontend/lametime.c
+@ENABLE_UNIT_TESTS_TRUE@am_test_file_times_OBJECTS = test_file_times-test_file_times.$(OBJEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_file_times-lametime.$(OBJEXT)
+test_file_times_OBJECTS = $(am_test_file_times_OBJECTS)
+@ENABLE_UNIT_TESTS_TRUE@test_file_times_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1)
 am__test_free_format_SOURCES_DIST = test_free_format.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_free_format_OBJECTS = test_free_format-test_free_format.$(OBJEXT)
 test_free_format_OBJECTS = $(am_test_free_format_OBJECTS)
@@ -391,11 +410,14 @@ am__depfiles_remade =  \
 	./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po \
 	./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po \
 	./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po \
+	./$(DEPDIR)/test_decode_scale-test_decode_scale.Po \
 	./$(DEPDIR)/test_decoder_api-test_decoder_api.Po \
 	./$(DEPDIR)/test_encode_api-test_encode_api.Po \
 	./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po \
 	./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po \
 	./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po \
+	./$(DEPDIR)/test_file_times-lametime.Po \
+	./$(DEPDIR)/test_file_times-test_file_times.Po \
 	./$(DEPDIR)/test_free_format-test_free_format.Po \
 	./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po \
 	./$(DEPDIR)/test_get_audio_aiff-test_stubs.Po \
@@ -444,15 +466,15 @@ SOURCES = $(test_bitstream_headers_SOURCES) \
 	$(test_calc_sfb_noise_vector_SOURCES) \
 	$(test_choose_table_neon_SOURCES) \
 	$(test_choose_table_vector_SOURCES) \
-	$(test_decoder_api_SOURCES) $(test_encode_api_SOURCES) \
-	$(test_encode_clipgain_SOURCES) \
+	$(test_decode_scale_SOURCES) $(test_decoder_api_SOURCES) \
+	$(test_encode_api_SOURCES) $(test_encode_clipgain_SOURCES) \
 	$(test_encode_mono_interleaved_SOURCES) \
-	$(test_encode_nonfinite_SOURCES) $(test_free_format_SOURCES) \
-	$(test_get_audio_aiff_SOURCES) $(test_get_audio_wav_SOURCES) \
-	$(test_help_exit_SOURCES) $(test_huffman_tables_SOURCES) \
-	$(test_id3tag_SOURCES) $(test_lib_info_SOURCES) \
-	$(test_merge_argv_SOURCES) $(test_parse_id3_SOURCES) \
-	$(test_parse_pathlen_SOURCES) \
+	$(test_encode_nonfinite_SOURCES) $(test_file_times_SOURCES) \
+	$(test_free_format_SOURCES) $(test_get_audio_aiff_SOURCES) \
+	$(test_get_audio_wav_SOURCES) $(test_help_exit_SOURCES) \
+	$(test_huffman_tables_SOURCES) $(test_id3tag_SOURCES) \
+	$(test_lib_info_SOURCES) $(test_merge_argv_SOURCES) \
+	$(test_parse_id3_SOURCES) $(test_parse_pathlen_SOURCES) \
 	$(test_quantize_lines_vector_SOURCES) \
 	$(test_resample_decision_SOURCES) $(test_rtp_socket_SOURCES) \
 	$(test_sanity_SOURCES) $(test_set_get_SOURCES) \
@@ -462,11 +484,13 @@ DIST_SOURCES = $(am__test_bitstream_headers_SOURCES_DIST) \
 	$(am__test_calc_sfb_noise_vector_SOURCES_DIST) \
 	$(am__test_choose_table_neon_SOURCES_DIST) \
 	$(am__test_choose_table_vector_SOURCES_DIST) \
+	$(am__test_decode_scale_SOURCES_DIST) \
 	$(am__test_decoder_api_SOURCES_DIST) \
 	$(am__test_encode_api_SOURCES_DIST) \
 	$(am__test_encode_clipgain_SOURCES_DIST) \
 	$(am__test_encode_mono_interleaved_SOURCES_DIST) \
 	$(am__test_encode_nonfinite_SOURCES_DIST) \
+	$(am__test_file_times_SOURCES_DIST) \
 	$(am__test_free_format_SOURCES_DIST) \
 	$(am__test_get_audio_aiff_SOURCES_DIST) \
 	$(am__test_get_audio_wav_SOURCES_DIST) \
@@ -1295,6 +1319,36 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 @ENABLE_UNIT_TESTS_TRUE@@WITH_NEON_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorneon.la
 
 
+# hip_decode1_unclipped() is internal and withheld from the shared library by
+# include/libmp3lame.sym, so this links the STATIC archive (-static) to reach
+# it, the same way test_vector_ladder does. Built everywhere and not gated on
+# the decoder: a build without libmpg123 hands back no decoder handle and the
+# tests skip, which keeps "no decoder" distinguishable from "a decoder whose
+# output is in the wrong scale" - that distinction being the whole subject.
+@ENABLE_UNIT_TESTS_TRUE@test_decode_scale_SOURCES = test_decode_scale.c
+@ENABLE_UNIT_TESTS_TRUE@test_decode_scale_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@test_decode_scale_LDFLAGS = -static
+@ENABLE_UNIT_TESTS_TRUE@test_decode_scale_LDADD = $(CMOCKA_LIBS) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
+@ENABLE_UNIT_TESTS_TRUE@	-lm
+
+
+# The file-time helpers are external but lametime.c is a frontend translation
+# unit, not part of the library, so the test compiles it in directly - the same
+# arrangement the get_audio and rtp tests use. It touches no encoder state, so
+# it links nothing beyond cmocka.
+@ENABLE_UNIT_TESTS_TRUE@test_file_times_SOURCES = test_file_times.c $(top_srcdir)/frontend/lametime.c
+@ENABLE_UNIT_TESTS_TRUE@test_file_times_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@test_file_times_LDADD = $(CMOCKA_LIBS)
+
 # rtp_socket() is external but the file is a frontend translation unit, not part
 # of the library, so the test compiles it in directly - the same arrangement the
 # get_audio and parse tests use. It needs the resolver library on the platforms
@@ -1379,6 +1433,10 @@ test_choose_table_vector$(EXEEXT): $(test_choose_table_vector_OBJECTS) $(test_ch
 	@rm -f test_choose_table_vector$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_choose_table_vector_OBJECTS) $(test_choose_table_vector_LDADD) $(LIBS)
 
+test_decode_scale$(EXEEXT): $(test_decode_scale_OBJECTS) $(test_decode_scale_DEPENDENCIES) $(EXTRA_test_decode_scale_DEPENDENCIES) 
+	@rm -f test_decode_scale$(EXEEXT)
+	$(AM_V_CCLD)$(test_decode_scale_LINK) $(test_decode_scale_OBJECTS) $(test_decode_scale_LDADD) $(LIBS)
+
 test_decoder_api$(EXEEXT): $(test_decoder_api_OBJECTS) $(test_decoder_api_DEPENDENCIES) $(EXTRA_test_decoder_api_DEPENDENCIES) 
 	@rm -f test_decoder_api$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_decoder_api_OBJECTS) $(test_decoder_api_LDADD) $(LIBS)
@@ -1398,6 +1456,10 @@ test_encode_mono_interleaved$(EXEEXT): $(test_encode_mono_interleaved_OBJECTS) $
 test_encode_nonfinite$(EXEEXT): $(test_encode_nonfinite_OBJECTS) $(test_encode_nonfinite_DEPENDENCIES) $(EXTRA_test_encode_nonfinite_DEPENDENCIES) 
 	@rm -f test_encode_nonfinite$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_encode_nonfinite_OBJECTS) $(test_encode_nonfinite_LDADD) $(LIBS)
+
+test_file_times$(EXEEXT): $(test_file_times_OBJECTS) $(test_file_times_DEPENDENCIES) $(EXTRA_test_file_times_DEPENDENCIES) 
+	@rm -f test_file_times$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_file_times_OBJECTS) $(test_file_times_LDADD) $(LIBS)
 
 test_free_format$(EXEEXT): $(test_free_format_OBJECTS) $(test_free_format_DEPENDENCIES) $(EXTRA_test_free_format_DEPENDENCIES) 
 	@rm -f test_free_format$(EXEEXT)
@@ -1481,11 +1543,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_decode_scale-test_decode_scale.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_decoder_api-test_decoder_api.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_api-test_encode_api.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_file_times-lametime.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_file_times-test_file_times.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_free_format-test_free_format.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_get_audio_aiff-test_stubs.Po@am__quote@ # am--include-marker
@@ -1595,6 +1660,20 @@ test_choose_table_vector-test_choose_table_vector.obj: test_choose_table_vector.
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_choose_table_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_choose_table_vector-test_choose_table_vector.obj `if test -f 'test_choose_table_vector.c'; then $(CYGPATH_W) 'test_choose_table_vector.c'; else $(CYGPATH_W) '$(srcdir)/test_choose_table_vector.c'; fi`
 
+test_decode_scale-test_decode_scale.o: test_decode_scale.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decode_scale_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_decode_scale-test_decode_scale.o -MD -MP -MF $(DEPDIR)/test_decode_scale-test_decode_scale.Tpo -c -o test_decode_scale-test_decode_scale.o `test -f 'test_decode_scale.c' || echo '$(srcdir)/'`test_decode_scale.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_decode_scale-test_decode_scale.Tpo $(DEPDIR)/test_decode_scale-test_decode_scale.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_decode_scale.c' object='test_decode_scale-test_decode_scale.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decode_scale_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_decode_scale-test_decode_scale.o `test -f 'test_decode_scale.c' || echo '$(srcdir)/'`test_decode_scale.c
+
+test_decode_scale-test_decode_scale.obj: test_decode_scale.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decode_scale_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_decode_scale-test_decode_scale.obj -MD -MP -MF $(DEPDIR)/test_decode_scale-test_decode_scale.Tpo -c -o test_decode_scale-test_decode_scale.obj `if test -f 'test_decode_scale.c'; then $(CYGPATH_W) 'test_decode_scale.c'; else $(CYGPATH_W) '$(srcdir)/test_decode_scale.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_decode_scale-test_decode_scale.Tpo $(DEPDIR)/test_decode_scale-test_decode_scale.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_decode_scale.c' object='test_decode_scale-test_decode_scale.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decode_scale_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_decode_scale-test_decode_scale.obj `if test -f 'test_decode_scale.c'; then $(CYGPATH_W) 'test_decode_scale.c'; else $(CYGPATH_W) '$(srcdir)/test_decode_scale.c'; fi`
+
 test_decoder_api-test_decoder_api.o: test_decoder_api.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decoder_api_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_decoder_api-test_decoder_api.o -MD -MP -MF $(DEPDIR)/test_decoder_api-test_decoder_api.Tpo -c -o test_decoder_api-test_decoder_api.o `test -f 'test_decoder_api.c' || echo '$(srcdir)/'`test_decoder_api.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_decoder_api-test_decoder_api.Tpo $(DEPDIR)/test_decoder_api-test_decoder_api.Po
@@ -1664,6 +1743,34 @@ test_encode_nonfinite-test_encode_nonfinite.obj: test_encode_nonfinite.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_encode_nonfinite.c' object='test_encode_nonfinite-test_encode_nonfinite.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_nonfinite_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_encode_nonfinite-test_encode_nonfinite.obj `if test -f 'test_encode_nonfinite.c'; then $(CYGPATH_W) 'test_encode_nonfinite.c'; else $(CYGPATH_W) '$(srcdir)/test_encode_nonfinite.c'; fi`
+
+test_file_times-test_file_times.o: test_file_times.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_file_times-test_file_times.o -MD -MP -MF $(DEPDIR)/test_file_times-test_file_times.Tpo -c -o test_file_times-test_file_times.o `test -f 'test_file_times.c' || echo '$(srcdir)/'`test_file_times.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_file_times-test_file_times.Tpo $(DEPDIR)/test_file_times-test_file_times.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_file_times.c' object='test_file_times-test_file_times.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_file_times-test_file_times.o `test -f 'test_file_times.c' || echo '$(srcdir)/'`test_file_times.c
+
+test_file_times-test_file_times.obj: test_file_times.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_file_times-test_file_times.obj -MD -MP -MF $(DEPDIR)/test_file_times-test_file_times.Tpo -c -o test_file_times-test_file_times.obj `if test -f 'test_file_times.c'; then $(CYGPATH_W) 'test_file_times.c'; else $(CYGPATH_W) '$(srcdir)/test_file_times.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_file_times-test_file_times.Tpo $(DEPDIR)/test_file_times-test_file_times.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_file_times.c' object='test_file_times-test_file_times.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_file_times-test_file_times.obj `if test -f 'test_file_times.c'; then $(CYGPATH_W) 'test_file_times.c'; else $(CYGPATH_W) '$(srcdir)/test_file_times.c'; fi`
+
+test_file_times-lametime.o: $(top_srcdir)/frontend/lametime.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_file_times-lametime.o -MD -MP -MF $(DEPDIR)/test_file_times-lametime.Tpo -c -o test_file_times-lametime.o `test -f '$(top_srcdir)/frontend/lametime.c' || echo '$(srcdir)/'`$(top_srcdir)/frontend/lametime.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_file_times-lametime.Tpo $(DEPDIR)/test_file_times-lametime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/frontend/lametime.c' object='test_file_times-lametime.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_file_times-lametime.o `test -f '$(top_srcdir)/frontend/lametime.c' || echo '$(srcdir)/'`$(top_srcdir)/frontend/lametime.c
+
+test_file_times-lametime.obj: $(top_srcdir)/frontend/lametime.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_file_times-lametime.obj -MD -MP -MF $(DEPDIR)/test_file_times-lametime.Tpo -c -o test_file_times-lametime.obj `if test -f '$(top_srcdir)/frontend/lametime.c'; then $(CYGPATH_W) '$(top_srcdir)/frontend/lametime.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/frontend/lametime.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_file_times-lametime.Tpo $(DEPDIR)/test_file_times-lametime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/frontend/lametime.c' object='test_file_times-lametime.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_file_times-lametime.obj `if test -f '$(top_srcdir)/frontend/lametime.c'; then $(CYGPATH_W) '$(top_srcdir)/frontend/lametime.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/frontend/lametime.c'; fi`
 
 test_free_format-test_free_format.o: test_free_format.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_free_format_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_free_format-test_free_format.o -MD -MP -MF $(DEPDIR)/test_free_format-test_free_format.Tpo -c -o test_free_format-test_free_format.o `test -f 'test_free_format.c' || echo '$(srcdir)/'`test_free_format.c
@@ -2393,6 +2500,20 @@ test_resample_decision.log: test_resample_decision$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_file_times.log: test_file_times$(EXEEXT)
+	@p='test_file_times$(EXEEXT)'; \
+	b='test_file_times'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_decode_scale.log: test_decode_scale$(EXEEXT)
+	@p='test_decode_scale$(EXEEXT)'; \
+	b='test_decode_scale'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 test_choose_table_vector.log: test_choose_table_vector$(EXEEXT)
 	@p='test_choose_table_vector$(EXEEXT)'; \
 	b='test_choose_table_vector'; \
@@ -2525,11 +2646,14 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po
+	-rm -f ./$(DEPDIR)/test_decode_scale-test_decode_scale.Po
 	-rm -f ./$(DEPDIR)/test_decoder_api-test_decoder_api.Po
 	-rm -f ./$(DEPDIR)/test_encode_api-test_encode_api.Po
 	-rm -f ./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po
 	-rm -f ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po
 	-rm -f ./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po
+	-rm -f ./$(DEPDIR)/test_file_times-lametime.Po
+	-rm -f ./$(DEPDIR)/test_file_times-test_file_times.Po
 	-rm -f ./$(DEPDIR)/test_free_format-test_free_format.Po
 	-rm -f ./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po
 	-rm -f ./$(DEPDIR)/test_get_audio_aiff-test_stubs.Po
@@ -2604,11 +2728,14 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po
+	-rm -f ./$(DEPDIR)/test_decode_scale-test_decode_scale.Po
 	-rm -f ./$(DEPDIR)/test_decoder_api-test_decoder_api.Po
 	-rm -f ./$(DEPDIR)/test_encode_api-test_encode_api.Po
 	-rm -f ./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po
 	-rm -f ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po
 	-rm -f ./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po
+	-rm -f ./$(DEPDIR)/test_file_times-lametime.Po
+	-rm -f ./$(DEPDIR)/test_file_times-test_file_times.Po
 	-rm -f ./$(DEPDIR)/test_free_format-test_free_format.Po
 	-rm -f ./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po
 	-rm -f ./$(DEPDIR)/test_get_audio_aiff-test_stubs.Po
