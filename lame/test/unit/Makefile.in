@@ -235,8 +235,9 @@ test_encode_nonfinite_OBJECTS = $(am_test_encode_nonfinite_OBJECTS)
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
 am__test_file_times_SOURCES_DIST = test_file_times.c \
 	$(top_srcdir)/frontend/lametime.c
+am__dirstamp = $(am__leading_dot)dirstamp
 @ENABLE_UNIT_TESTS_TRUE@am_test_file_times_OBJECTS = test_file_times-test_file_times.$(OBJEXT) \
-@ENABLE_UNIT_TESTS_TRUE@	test_file_times-lametime.$(OBJEXT)
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/frontend/test_file_times-lametime.$(OBJEXT)
 test_file_times_OBJECTS = $(am_test_file_times_OBJECTS)
 @ENABLE_UNIT_TESTS_TRUE@test_file_times_DEPENDENCIES =  \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1)
@@ -349,7 +350,7 @@ test_resample_decision_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 am__test_rtp_socket_SOURCES_DIST = test_rtp_socket.c \
 	$(top_srcdir)/frontend/rtp.c
 @ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@am_test_rtp_socket_OBJECTS = test_rtp_socket-test_rtp_socket.$(OBJEXT) \
-@ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@	test_rtp_socket-rtp.$(OBJEXT)
+@ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@	$(top_builddir)/frontend/test_rtp_socket-rtp.$(OBJEXT)
 test_rtp_socket_OBJECTS = $(am_test_rtp_socket_OBJECTS)
 @ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@test_rtp_socket_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__test_sanity_SOURCES_DIST = test_sanity.c
@@ -405,7 +406,8 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade =  \
+am__depfiles_remade = $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po \
+	$(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po \
 	./$(DEPDIR)/test_bitstream_headers-test_bitstream_headers.Po \
 	./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po \
 	./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po \
@@ -416,7 +418,6 @@ am__depfiles_remade =  \
 	./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po \
 	./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po \
 	./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po \
-	./$(DEPDIR)/test_file_times-lametime.Po \
 	./$(DEPDIR)/test_file_times-test_file_times.Po \
 	./$(DEPDIR)/test_free_format-test_free_format.Po \
 	./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po \
@@ -436,7 +437,6 @@ am__depfiles_remade =  \
 	./$(DEPDIR)/test_parse_pathlen-test_parse_pathlen.Po \
 	./$(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po \
 	./$(DEPDIR)/test_resample_decision-test_resample_decision.Po \
-	./$(DEPDIR)/test_rtp_socket-rtp.Po \
 	./$(DEPDIR)/test_rtp_socket-test_rtp_socket.Po \
 	./$(DEPDIR)/test_sanity-test_sanity.Po \
 	./$(DEPDIR)/test_set_get-test_set_get.Po \
@@ -786,12 +786,12 @@ FRONTEND_UNICODE_LDFLAGS = @FRONTEND_UNICODE_LDFLAGS@
 GREP = @GREP@
 GTK_CFLAGS = @GTK_CFLAGS@
 GTK_LIBS = @GTK_LIBS@
-INCLUDES = @INCLUDES@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+LAME_CPPFLAGS = @LAME_CPPFLAGS@
 LD = @LD@
 LDADD = @LDADD@
 LDFLAGS = @LDFLAGS@
@@ -910,13 +910,23 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = 1.15 foreign
 
+# What configure found: the include path, and the flags for the
+# optional libraries. A per-target CPPFLAGS setting replaces this one
+# rather than adding to it, so the targets below that have their own
+# name it explicitly.
+AM_CPPFLAGS = @LAME_CPPFLAGS@
+
+# TEST_EXTENSIONS is read while automake builds its list of test drivers, so
+# it may not sit inside the conditional below; SH_LOG_COMPILER belongs beside
+# the extension it serves.
+TEST_EXTENSIONS = .sh
+SH_LOG_COMPILER = $(SHELL)
+
 # The frontend's exit status on a failed read. This one drives the built lame
 # binary rather than the library, so it needs the source root for the test
 # input as well as the build root for the binary; both are exported below.
 @ENABLE_UNIT_TESTS_TRUE@TESTS = $(check_PROGRAMS) test_pkgconfig.sh \
 @ENABLE_UNIT_TESTS_TRUE@	test_exit_status.sh
-@ENABLE_UNIT_TESTS_TRUE@TEST_EXTENSIONS = .sh
-@ENABLE_UNIT_TESTS_TRUE@SH_LOG_COMPILER = $(SHELL)
 
 # Every test here links libmp3lame, and every one of them has to load the copy
 # this build just produced - not one the host happens to have installed. That
@@ -944,14 +954,14 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 @ENABLE_UNIT_TESTS_TRUE@	PKG_CONFIG='$(PKG_CONFIG)'; export \
 @ENABLE_UNIT_TESTS_TRUE@	PKG_CONFIG;
 @ENABLE_UNIT_TESTS_TRUE@test_sanity_SOURCES = test_sanity.c
-@ENABLE_UNIT_TESTS_TRUE@test_sanity_CPPFLAGS = $(CMOCKA_CFLAGS)
+@ENABLE_UNIT_TESTS_TRUE@test_sanity_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS)
 @ENABLE_UNIT_TESTS_TRUE@test_sanity_LDADD = $(CMOCKA_LIBS)
 
 # The AIFF header parser lives in frontend/get_audio.c and is static, so the
 # test compiles it in directly (hence the frontend/libmp3lame/include search
 # paths). fread is wrapped to trap the underflow spin the guard prevents.
 @ENABLE_UNIT_TESTS_TRUE@test_get_audio_aiff_SOURCES = test_get_audio_aiff.c test_stubs.c
-@ENABLE_UNIT_TESTS_TRUE@test_get_audio_aiff_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_get_audio_aiff_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
@@ -972,7 +982,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # applies - minus the fread wrapper, which exists for an AIFF chunk loop this
 # parser does not have.
 @ENABLE_UNIT_TESTS_TRUE@test_get_audio_wav_SOURCES = test_get_audio_wav.c test_stubs.c
-@ENABLE_UNIT_TESTS_TRUE@test_get_audio_wav_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_get_audio_wav_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
@@ -988,7 +998,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # parse_test_stubs.c supplies the console/file helpers it references and
 # libmp3lame provides the lame_* API.
 @ENABLE_UNIT_TESTS_TRUE@test_parse_pathlen_SOURCES = test_parse_pathlen.c parse_test_stubs.c
-@ENABLE_UNIT_TESTS_TRUE@test_parse_pathlen_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_parse_pathlen_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
@@ -1001,7 +1011,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 
 # merge_argv() is likewise static in frontend/parse.c; same include/link setup.
 @ENABLE_UNIT_TESTS_TRUE@test_merge_argv_SOURCES = test_merge_argv.c parse_test_stubs.c
-@ENABLE_UNIT_TESTS_TRUE@test_merge_argv_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_merge_argv_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
@@ -1015,7 +1025,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # The help paths run the whole option parser rather than one static helper,
 # but they reach it the same way, so the include/link setup is identical.
 @ENABLE_UNIT_TESTS_TRUE@test_help_exit_SOURCES = test_help_exit.c parse_test_stubs.c
-@ENABLE_UNIT_TESTS_TRUE@test_help_exit_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_help_exit_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
@@ -1029,7 +1039,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # The id3tag_* API is public, so this test links libmp3lame and calls it
 # directly - no frontend translation unit compiled in.
 @ENABLE_UNIT_TESTS_TRUE@test_id3tag_SOURCES = test_id3tag.c
-@ENABLE_UNIT_TESTS_TRUE@test_id3tag_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_id3tag_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1042,7 +1052,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # this test compiles parse.c in directly; same include/link setup as the other
 # parse.c tests.
 @ENABLE_UNIT_TESTS_TRUE@test_parse_id3_SOURCES = test_parse_id3.c parse_test_stubs.c
-@ENABLE_UNIT_TESTS_TRUE@test_parse_id3_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_parse_id3_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
@@ -1056,7 +1066,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # The encoding entry points are public, so this test links libmp3lame and calls
 # them directly - no frontend translation unit compiled in.
 @ENABLE_UNIT_TESTS_TRUE@test_encode_nonfinite_SOURCES = test_encode_nonfinite.c
-@ENABLE_UNIT_TESTS_TRUE@test_encode_nonfinite_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_encode_nonfinite_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1068,7 +1078,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # The interleaved entry points are public, so this test links libmp3lame and
 # calls them directly - no frontend translation unit compiled in.
 @ENABLE_UNIT_TESTS_TRUE@test_encode_mono_interleaved_SOURCES = test_encode_mono_interleaved.c
-@ENABLE_UNIT_TESTS_TRUE@test_encode_mono_interleaved_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_encode_mono_interleaved_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1082,7 +1092,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # measurement is requested from the caller's setting whether or not the build
 # can decode, so the silent case has to hold in both.
 @ENABLE_UNIT_TESTS_TRUE@test_encode_clipgain_SOURCES = test_encode_clipgain.c
-@ENABLE_UNIT_TESTS_TRUE@test_encode_clipgain_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_encode_clipgain_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1096,7 +1106,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # built everywhere: the settings it needs are the format's own low end, not a
 # property of any build.
 @ENABLE_UNIT_TESTS_TRUE@test_bitstream_headers_SOURCES = test_bitstream_headers.c
-@ENABLE_UNIT_TESTS_TRUE@test_bitstream_headers_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_bitstream_headers_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1109,7 +1119,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # lame_init_params(), so this test links libmp3lame and asks it directly. It
 # encodes nothing, which is why it costs microseconds.
 @ENABLE_UNIT_TESTS_TRUE@test_free_format_SOURCES = test_free_format.c
-@ENABLE_UNIT_TESTS_TRUE@test_free_format_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_free_format_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1124,7 +1134,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # some way: proving the four integer entry points agree means encoding the same
 # audio five times over, and there is no shortcut that still compares streams.
 @ENABLE_UNIT_TESTS_TRUE@test_encode_api_SOURCES = test_encode_api.c
-@ENABLE_UNIT_TESTS_TRUE@test_encode_api_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_encode_api_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1138,7 +1148,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # it, the same way test_vector_ladder does. The encode arms in the same file go
 # through the public API and need no such help.
 @ENABLE_UNIT_TESTS_TRUE@test_resample_decision_SOURCES = test_resample_decision.c
-@ENABLE_UNIT_TESTS_TRUE@test_resample_decision_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_resample_decision_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
@@ -1152,7 +1162,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # lame_get_totalframes() is public, so this test links libmp3lame and calls it
 # directly - no frontend translation unit compiled in.
 @ENABLE_UNIT_TESTS_TRUE@test_totalframes_SOURCES = test_totalframes.c
-@ENABLE_UNIT_TESTS_TRUE@test_totalframes_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_totalframes_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1165,7 +1175,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # public and take no encoder instance, so this test links libmp3lame and calls
 # them directly - no frontend translation unit compiled in.
 @ENABLE_UNIT_TESTS_TRUE@test_lib_info_SOURCES = test_lib_info.c
-@ENABLE_UNIT_TESTS_TRUE@test_lib_info_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_lib_info_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1179,7 +1189,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # built everywhere, with no WITH_XMM/WITH_NEON gate. A build with no vector
 # routines at all is one of the configurations it has to hold for.
 @ENABLE_UNIT_TESTS_TRUE@test_vector_routines_SOURCES = test_vector_routines.c
-@ENABLE_UNIT_TESTS_TRUE@test_vector_routines_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_vector_routines_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1196,7 +1206,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # no vector routines at all, and that configuration is exactly the one an
 # architecture gate would stop testing.
 @ENABLE_UNIT_TESTS_TRUE@test_vector_ladder_SOURCES = test_vector_ladder.c
-@ENABLE_UNIT_TESTS_TRUE@test_vector_ladder_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_vector_ladder_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
@@ -1212,7 +1222,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # decoder: a library without libmpg123 hands back no handle at all, and that is
 # one of the configurations the calls have to survive.
 @ENABLE_UNIT_TESTS_TRUE@test_decoder_api_SOURCES = test_decoder_api.c
-@ENABLE_UNIT_TESTS_TRUE@test_decoder_api_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_decoder_api_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1226,7 +1236,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # include/libmp3lame.sym, so this links the STATIC archive (-static) to reach
 # them, the same way test_vector_ladder does.
 @ENABLE_UNIT_TESTS_TRUE@test_huffman_tables_SOURCES = test_huffman_tables.c
-@ENABLE_UNIT_TESTS_TRUE@test_huffman_tables_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_huffman_tables_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
@@ -1246,7 +1256,8 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # --enable-internal this test links the STATIC archive (-static) to reach them;
 # a normal build tests only the exported interface and links the shared library.
 @ENABLE_UNIT_TESTS_TRUE@test_set_get_SOURCES = test_set_get.c
-@ENABLE_UNIT_TESTS_TRUE@test_set_get_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_set_get_CPPFLAGS = $(AM_CPPFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	$(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir) $(am__append_4)
@@ -1261,7 +1272,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # those libraries directly. It needs nothing else from the encoder: each
 # routine is a function of its arguments, tables included.
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_choose_table_vector_SOURCES = test_choose_table_vector.c
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_choose_table_vector_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_choose_table_vector_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_builddir)
@@ -1273,7 +1284,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 
 # Same arrangement for the quantization loop, and for the same reason.
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_SOURCES = test_quantize_lines_vector.c
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_builddir)
@@ -1288,7 +1299,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # library: that routine was measured on hardware that has AVX-512, found to cost
 # time, and removed. See @ref vector_dispatch.
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_calc_sfb_noise_vector_SOURCES = test_calc_sfb_noise_vector.c
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_calc_sfb_noise_vector_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_calc_sfb_noise_vector_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-I$(top_builddir)
@@ -1310,7 +1321,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # libraries at all, and the failure was `undefined symbol: main`, which names
 # neither the program nor the conditional.
 @ENABLE_UNIT_TESTS_TRUE@@WITH_NEON_TRUE@test_choose_table_neon_SOURCES = test_choose_table_neon.c
-@ENABLE_UNIT_TESTS_TRUE@@WITH_NEON_TRUE@test_choose_table_neon_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_NEON_TRUE@test_choose_table_neon_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_NEON_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_NEON_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_NEON_TRUE@	-I$(top_builddir)
@@ -1326,7 +1337,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # tests skip, which keeps "no decoder" distinguishable from "a decoder whose
 # output is in the wrong scale" - that distinction being the whole subject.
 @ENABLE_UNIT_TESTS_TRUE@test_decode_scale_SOURCES = test_decode_scale.c
-@ENABLE_UNIT_TESTS_TRUE@test_decode_scale_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_decode_scale_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
@@ -1342,7 +1353,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # arrangement the get_audio and rtp tests use. It touches no encoder state, so
 # it links nothing beyond cmocka.
 @ENABLE_UNIT_TESTS_TRUE@test_file_times_SOURCES = test_file_times.c $(top_srcdir)/frontend/lametime.c
-@ENABLE_UNIT_TESTS_TRUE@test_file_times_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@test_file_times_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
@@ -1356,7 +1367,7 @@ AUTOMAKE_OPTIONS = 1.15 foreign
 # same one. The lone frontend symbol rtp.c reaches for, error_printf(), is
 # stubbed inside the test rather than dragging in console.c.
 @ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@test_rtp_socket_SOURCES = test_rtp_socket.c $(top_srcdir)/frontend/rtp.c
-@ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@test_rtp_socket_CPPFLAGS = $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@test_rtp_socket_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@	-I$(top_srcdir)/frontend \
 @ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@	-I$(top_builddir)
@@ -1456,6 +1467,15 @@ test_encode_mono_interleaved$(EXEEXT): $(test_encode_mono_interleaved_OBJECTS) $
 test_encode_nonfinite$(EXEEXT): $(test_encode_nonfinite_OBJECTS) $(test_encode_nonfinite_DEPENDENCIES) $(EXTRA_test_encode_nonfinite_DEPENDENCIES) 
 	@rm -f test_encode_nonfinite$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_encode_nonfinite_OBJECTS) $(test_encode_nonfinite_LDADD) $(LIBS)
+$(top_builddir)/frontend/$(am__dirstamp):
+	@$(MKDIR_P) $(top_builddir)/frontend
+	@: >>$(top_builddir)/frontend/$(am__dirstamp)
+$(top_builddir)/frontend/$(DEPDIR)/$(am__dirstamp):
+	@$(MKDIR_P) $(top_builddir)/frontend/$(DEPDIR)
+	@: >>$(top_builddir)/frontend/$(DEPDIR)/$(am__dirstamp)
+$(top_builddir)/frontend/test_file_times-lametime.$(OBJEXT):  \
+	$(top_builddir)/frontend/$(am__dirstamp) \
+	$(top_builddir)/frontend/$(DEPDIR)/$(am__dirstamp)
 
 test_file_times$(EXEEXT): $(test_file_times_OBJECTS) $(test_file_times_DEPENDENCIES) $(EXTRA_test_file_times_DEPENDENCIES) 
 	@rm -f test_file_times$(EXEEXT)
@@ -1508,6 +1528,9 @@ test_quantize_lines_vector$(EXEEXT): $(test_quantize_lines_vector_OBJECTS) $(tes
 test_resample_decision$(EXEEXT): $(test_resample_decision_OBJECTS) $(test_resample_decision_DEPENDENCIES) $(EXTRA_test_resample_decision_DEPENDENCIES) 
 	@rm -f test_resample_decision$(EXEEXT)
 	$(AM_V_CCLD)$(test_resample_decision_LINK) $(test_resample_decision_OBJECTS) $(test_resample_decision_LDADD) $(LIBS)
+$(top_builddir)/frontend/test_rtp_socket-rtp.$(OBJEXT):  \
+	$(top_builddir)/frontend/$(am__dirstamp) \
+	$(top_builddir)/frontend/$(DEPDIR)/$(am__dirstamp)
 
 test_rtp_socket$(EXEEXT): $(test_rtp_socket_OBJECTS) $(test_rtp_socket_DEPENDENCIES) $(EXTRA_test_rtp_socket_DEPENDENCIES) 
 	@rm -f test_rtp_socket$(EXEEXT)
@@ -1535,10 +1558,13 @@ test_vector_routines$(EXEEXT): $(test_vector_routines_OBJECTS) $(test_vector_rou
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
+	-rm -f $(top_builddir)/frontend/*.$(OBJEXT)
 
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_bitstream_headers-test_bitstream_headers.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po@am__quote@ # am--include-marker
@@ -1549,7 +1575,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_file_times-lametime.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_file_times-test_file_times.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_free_format-test_free_format.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po@am__quote@ # am--include-marker
@@ -1569,7 +1594,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_parse_pathlen-test_parse_pathlen.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_resample_decision-test_resample_decision.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rtp_socket-rtp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_rtp_socket-test_rtp_socket.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_sanity-test_sanity.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_set_get-test_set_get.Po@am__quote@ # am--include-marker
@@ -1584,22 +1608,25 @@ $(am__depfiles_remade):
 am--depfiles: $(am__depfiles_remade)
 
 .c.o:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ $<
 
 .c.obj:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
+@am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(COMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
 .c.lo:
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LTCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
+@am__fastdepCC_TRUE@	$(LTCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
+@am__fastdepCC_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
@@ -1758,19 +1785,19 @@ test_file_times-test_file_times.obj: test_file_times.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_file_times-test_file_times.obj `if test -f 'test_file_times.c'; then $(CYGPATH_W) 'test_file_times.c'; else $(CYGPATH_W) '$(srcdir)/test_file_times.c'; fi`
 
-test_file_times-lametime.o: $(top_srcdir)/frontend/lametime.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_file_times-lametime.o -MD -MP -MF $(DEPDIR)/test_file_times-lametime.Tpo -c -o test_file_times-lametime.o `test -f '$(top_srcdir)/frontend/lametime.c' || echo '$(srcdir)/'`$(top_srcdir)/frontend/lametime.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_file_times-lametime.Tpo $(DEPDIR)/test_file_times-lametime.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/frontend/lametime.c' object='test_file_times-lametime.o' libtool=no @AMDEPBACKSLASH@
+$(top_builddir)/frontend/test_file_times-lametime.o: $(top_builddir)/frontend/lametime.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT $(top_builddir)/frontend/test_file_times-lametime.o -MD -MP -MF $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Tpo -c -o $(top_builddir)/frontend/test_file_times-lametime.o `test -f '$(top_builddir)/frontend/lametime.c' || echo '$(srcdir)/'`$(top_builddir)/frontend/lametime.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Tpo $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_builddir)/frontend/lametime.c' object='$(top_builddir)/frontend/test_file_times-lametime.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_file_times-lametime.o `test -f '$(top_srcdir)/frontend/lametime.c' || echo '$(srcdir)/'`$(top_srcdir)/frontend/lametime.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o $(top_builddir)/frontend/test_file_times-lametime.o `test -f '$(top_builddir)/frontend/lametime.c' || echo '$(srcdir)/'`$(top_builddir)/frontend/lametime.c
 
-test_file_times-lametime.obj: $(top_srcdir)/frontend/lametime.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_file_times-lametime.obj -MD -MP -MF $(DEPDIR)/test_file_times-lametime.Tpo -c -o test_file_times-lametime.obj `if test -f '$(top_srcdir)/frontend/lametime.c'; then $(CYGPATH_W) '$(top_srcdir)/frontend/lametime.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/frontend/lametime.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_file_times-lametime.Tpo $(DEPDIR)/test_file_times-lametime.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/frontend/lametime.c' object='test_file_times-lametime.obj' libtool=no @AMDEPBACKSLASH@
+$(top_builddir)/frontend/test_file_times-lametime.obj: $(top_builddir)/frontend/lametime.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT $(top_builddir)/frontend/test_file_times-lametime.obj -MD -MP -MF $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Tpo -c -o $(top_builddir)/frontend/test_file_times-lametime.obj `if test -f '$(top_builddir)/frontend/lametime.c'; then $(CYGPATH_W) '$(top_builddir)/frontend/lametime.c'; else $(CYGPATH_W) '$(srcdir)/$(top_builddir)/frontend/lametime.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Tpo $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_builddir)/frontend/lametime.c' object='$(top_builddir)/frontend/test_file_times-lametime.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_file_times-lametime.obj `if test -f '$(top_srcdir)/frontend/lametime.c'; then $(CYGPATH_W) '$(top_srcdir)/frontend/lametime.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/frontend/lametime.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_file_times_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o $(top_builddir)/frontend/test_file_times-lametime.obj `if test -f '$(top_builddir)/frontend/lametime.c'; then $(CYGPATH_W) '$(top_builddir)/frontend/lametime.c'; else $(CYGPATH_W) '$(srcdir)/$(top_builddir)/frontend/lametime.c'; fi`
 
 test_free_format-test_free_format.o: test_free_format.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_free_format_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_free_format-test_free_format.o -MD -MP -MF $(DEPDIR)/test_free_format-test_free_format.Tpo -c -o test_free_format-test_free_format.o `test -f 'test_free_format.c' || echo '$(srcdir)/'`test_free_format.c
@@ -2038,19 +2065,19 @@ test_rtp_socket-test_rtp_socket.obj: test_rtp_socket.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_rtp_socket_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_rtp_socket-test_rtp_socket.obj `if test -f 'test_rtp_socket.c'; then $(CYGPATH_W) 'test_rtp_socket.c'; else $(CYGPATH_W) '$(srcdir)/test_rtp_socket.c'; fi`
 
-test_rtp_socket-rtp.o: $(top_srcdir)/frontend/rtp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_rtp_socket_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_rtp_socket-rtp.o -MD -MP -MF $(DEPDIR)/test_rtp_socket-rtp.Tpo -c -o test_rtp_socket-rtp.o `test -f '$(top_srcdir)/frontend/rtp.c' || echo '$(srcdir)/'`$(top_srcdir)/frontend/rtp.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_rtp_socket-rtp.Tpo $(DEPDIR)/test_rtp_socket-rtp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/frontend/rtp.c' object='test_rtp_socket-rtp.o' libtool=no @AMDEPBACKSLASH@
+$(top_builddir)/frontend/test_rtp_socket-rtp.o: $(top_builddir)/frontend/rtp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_rtp_socket_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT $(top_builddir)/frontend/test_rtp_socket-rtp.o -MD -MP -MF $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Tpo -c -o $(top_builddir)/frontend/test_rtp_socket-rtp.o `test -f '$(top_builddir)/frontend/rtp.c' || echo '$(srcdir)/'`$(top_builddir)/frontend/rtp.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Tpo $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_builddir)/frontend/rtp.c' object='$(top_builddir)/frontend/test_rtp_socket-rtp.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_rtp_socket_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_rtp_socket-rtp.o `test -f '$(top_srcdir)/frontend/rtp.c' || echo '$(srcdir)/'`$(top_srcdir)/frontend/rtp.c
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_rtp_socket_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o $(top_builddir)/frontend/test_rtp_socket-rtp.o `test -f '$(top_builddir)/frontend/rtp.c' || echo '$(srcdir)/'`$(top_builddir)/frontend/rtp.c
 
-test_rtp_socket-rtp.obj: $(top_srcdir)/frontend/rtp.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_rtp_socket_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_rtp_socket-rtp.obj -MD -MP -MF $(DEPDIR)/test_rtp_socket-rtp.Tpo -c -o test_rtp_socket-rtp.obj `if test -f '$(top_srcdir)/frontend/rtp.c'; then $(CYGPATH_W) '$(top_srcdir)/frontend/rtp.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/frontend/rtp.c'; fi`
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_rtp_socket-rtp.Tpo $(DEPDIR)/test_rtp_socket-rtp.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_srcdir)/frontend/rtp.c' object='test_rtp_socket-rtp.obj' libtool=no @AMDEPBACKSLASH@
+$(top_builddir)/frontend/test_rtp_socket-rtp.obj: $(top_builddir)/frontend/rtp.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_rtp_socket_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT $(top_builddir)/frontend/test_rtp_socket-rtp.obj -MD -MP -MF $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Tpo -c -o $(top_builddir)/frontend/test_rtp_socket-rtp.obj `if test -f '$(top_builddir)/frontend/rtp.c'; then $(CYGPATH_W) '$(top_builddir)/frontend/rtp.c'; else $(CYGPATH_W) '$(srcdir)/$(top_builddir)/frontend/rtp.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Tpo $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='$(top_builddir)/frontend/rtp.c' object='$(top_builddir)/frontend/test_rtp_socket-rtp.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_rtp_socket_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_rtp_socket-rtp.obj `if test -f '$(top_srcdir)/frontend/rtp.c'; then $(CYGPATH_W) '$(top_srcdir)/frontend/rtp.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/frontend/rtp.c'; fi`
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_rtp_socket_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o $(top_builddir)/frontend/test_rtp_socket-rtp.obj `if test -f '$(top_builddir)/frontend/rtp.c'; then $(CYGPATH_W) '$(top_builddir)/frontend/rtp.c'; else $(CYGPATH_W) '$(srcdir)/$(top_builddir)/frontend/rtp.c'; fi`
 
 test_sanity-test_sanity.o: test_sanity.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_sanity_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_sanity-test_sanity.o -MD -MP -MF $(DEPDIR)/test_sanity-test_sanity.Tpo -c -o test_sanity-test_sanity.o `test -f 'test_sanity.c' || echo '$(srcdir)/'`test_sanity.c
@@ -2632,6 +2659,8 @@ clean-generic:
 distclean-generic:
 	-$(am__rm_f) $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || $(am__rm_f) $(CONFIG_CLEAN_VPATH_FILES)
+	-$(am__rm_f) $(top_builddir)/frontend/$(DEPDIR)/$(am__dirstamp)
+	-$(am__rm_f) $(top_builddir)/frontend/$(am__dirstamp)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
@@ -2642,6 +2671,8 @@ clean-am: clean-checkPROGRAMS clean-generic clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
+	-rm -f $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po
+	-rm -f $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po
 	-rm -f ./$(DEPDIR)/test_bitstream_headers-test_bitstream_headers.Po
 	-rm -f ./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po
@@ -2652,7 +2683,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po
 	-rm -f ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po
 	-rm -f ./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po
-	-rm -f ./$(DEPDIR)/test_file_times-lametime.Po
 	-rm -f ./$(DEPDIR)/test_file_times-test_file_times.Po
 	-rm -f ./$(DEPDIR)/test_free_format-test_free_format.Po
 	-rm -f ./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po
@@ -2672,7 +2702,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/test_parse_pathlen-test_parse_pathlen.Po
 	-rm -f ./$(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po
 	-rm -f ./$(DEPDIR)/test_resample_decision-test_resample_decision.Po
-	-rm -f ./$(DEPDIR)/test_rtp_socket-rtp.Po
 	-rm -f ./$(DEPDIR)/test_rtp_socket-test_rtp_socket.Po
 	-rm -f ./$(DEPDIR)/test_sanity-test_sanity.Po
 	-rm -f ./$(DEPDIR)/test_set_get-test_set_get.Po
@@ -2724,6 +2753,8 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
+	-rm -f $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po
+	-rm -f $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po
 	-rm -f ./$(DEPDIR)/test_bitstream_headers-test_bitstream_headers.Po
 	-rm -f ./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po
@@ -2734,7 +2765,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po
 	-rm -f ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po
 	-rm -f ./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po
-	-rm -f ./$(DEPDIR)/test_file_times-lametime.Po
 	-rm -f ./$(DEPDIR)/test_file_times-test_file_times.Po
 	-rm -f ./$(DEPDIR)/test_free_format-test_free_format.Po
 	-rm -f ./$(DEPDIR)/test_get_audio_aiff-test_get_audio_aiff.Po
@@ -2754,7 +2784,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/test_parse_pathlen-test_parse_pathlen.Po
 	-rm -f ./$(DEPDIR)/test_quantize_lines_vector-test_quantize_lines_vector.Po
 	-rm -f ./$(DEPDIR)/test_resample_decision-test_resample_decision.Po
-	-rm -f ./$(DEPDIR)/test_rtp_socket-rtp.Po
 	-rm -f ./$(DEPDIR)/test_rtp_socket-test_rtp_socket.Po
 	-rm -f ./$(DEPDIR)/test_sanity-test_sanity.Po
 	-rm -f ./$(DEPDIR)/test_set_get-test_set_get.Po
