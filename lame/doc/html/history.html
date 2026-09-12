@@ -471,6 +471,11 @@
 			        application listing the codec no longer shows a
 			        nameless 16-bit entry for it. Bug ticket
 			        <i class="ticket">[ #362 ]</i>.</li>
+			    <li>The Windows ACM codec and the DirectShow filter
+			        carry the LAME version as their file version, and
+			        the codec reports it as its driver version, so the
+			        installed version can be read off either file. Bug
+			        ticket <i class="ticket">[ #416 ]</i>.</li>
 			    <li>The DirectShow filter's output pin answers
 			        interface requests through the pin class it is
 			        built on, so seeking works again when the filter
