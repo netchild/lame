@@ -308,6 +308,10 @@
 			        unparseable; no tag is produced in that case.</li>
 			    <li>The ID3v2 tag carries the full audio play-length,
 			        instead of clamping it to about 49.7 days.</li>
+			    <li>With <i>--nogap --nogaptags</i>, the LAME tag of
+			        every file after the first reports an encoder delay
+			        of zero; only the first file carries the lead-in.
+			        Bug ticket <i class="ticket">[ #397 ]</i>.</li>
 			</ul>
 		    </li>
 		    <li><b>Command-line behavior</b>
