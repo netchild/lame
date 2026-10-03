@@ -19,8 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>libmp3lame-static</ProjectName>
-    <ProjectGuid>{20536101-3B0E-43EF-94F9-080D595DAC57}</ProjectGuid>
+    <!-- The library without the decoder, whatever HaveMpg123 says. The Blade
+         DLL, the ACM codec and the DirectShow filter link it. -->
+    <ProjectName>libmp3lame-static-nodec</ProjectName>
+    <ProjectGuid>{E1EF883D-7969-4F80-A91E-F260807F2961}</ProjectGuid>
     <RootNamespace>libmp3lame</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -50,22 +52,18 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="vs_libmpg123_config.props" />
     <Import Project="vs_lame_config.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="vs_libmpg123_config.props" />
     <Import Project="vs_lame_config.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="vs_libmpg123_config.props" />
     <Import Project="vs_lame_config.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="vs_libmpg123_config.props" />
     <Import Project="vs_lame_config.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
