@@ -494,6 +494,7 @@ noinst_HEADERS = \
 	bitstream.h \
 	encoder.h \
 	fft.h \
+	fft_pvt.h \
 	gain_analysis.h \
 	id3tag.h \
 	l3side.h \
@@ -501,6 +502,7 @@ noinst_HEADERS = \
 	lame_global_flags.h \
 	machine.h \
 	newmdct.h \
+	obsolete_api.h \
 	psymodel.h \
 	quantize.h  \
 	quantize_pvt.h \

@@ -96,8 +96,11 @@ host_triplet = @host@
 @ENABLE_UNIT_TESTS_TRUE@	test_get_audio_wav$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_get_audio_float$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_parse_pathlen$(EXEEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_encode_error_text$(EXEEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_classify_suffix$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_merge_argv$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_id3tag$(EXEEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_id3tag_alloc$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_parse_id3$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_encode_nonfinite$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_encode_mono_interleaved$(EXEEXT) \
@@ -118,6 +121,8 @@ host_triplet = @host@
 @ENABLE_UNIT_TESTS_TRUE@	test_decode_scale$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_quantize_pe$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	test_gain_analysis$(EXEEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_decoder_init_fail$(EXEEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_bitstream_reservoir$(EXEEXT) \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__EXEEXT_1) $(am__EXEEXT_2) \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__EXEEXT_3)
 
@@ -132,17 +137,34 @@ host_triplet = @host@
 # whether mp3rtp can be built, rather than a second opinion about it.
 @ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@am__append_3 = test_rtp_socket
 
-# The frontend's exit status on a failed read. This one drives the built lame
-# binary rather than the library, so it needs the source root for the test
-# input as well as the build root for the binary; both are exported below.
-# It runs only where the frontend is built.
-@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@am__append_4 = test_exit_status.sh
-@ENABLE_UNIT_TESTS_TRUE@@INTERNAL_OPTS_TRUE@am__append_5 = -D_ALLOW_INTERNAL_OPTIONS
-@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX2_TRUE@@WITH_XMM_TRUE@am__append_6 = $(top_builddir)/libmp3lame/vector/liblamevectoravx2.la
+# The frontend's exit status on a failed read, its rejection of
+# --swap-channel for a mono input, the range --preset names in its error
+# message, the output files of --nogap and its handling of a failed file,
+# the bitrate histogram of a CBR encode, the byte order of --decode -x, the
+# times --preserve-modtime gives an output whose writing failed, and the exit
+# status for an output whose end could not be written.
+# These drive the built lame binary rather
+# than the library, so they need the source root for the test input as well as
+# the build root for the binary; both are exported below. They run only where
+# the frontend is built.
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@am__append_4 = test_exit_status.sh \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@	test_swap_channel.sh \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@	test_pipe_length.sh \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@	test_preset_range.sh \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@	test_nogap_files.sh \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@	test_brhist_cbr.sh \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@	test_nogap_failures.sh \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@	test_decode_swap.sh \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@	test_preserve_modtime.sh \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_LAME_FRONTEND_TRUE@	test_output_complete.sh
+# The exit status of mp3rtp. It skips where mp3rtp is not built.
+@ENABLE_UNIT_TESTS_TRUE@@HAVE_SOCKETS_TRUE@am__append_5 = test_mp3rtp_status.sh
+@ENABLE_UNIT_TESTS_TRUE@@INTERNAL_OPTS_TRUE@am__append_6 = -D_ALLOW_INTERNAL_OPTIONS
 @ENABLE_UNIT_TESTS_TRUE@@WITH_AVX2_TRUE@@WITH_XMM_TRUE@am__append_7 = $(top_builddir)/libmp3lame/vector/liblamevectoravx2.la
-@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX512_TRUE@@WITH_XMM_TRUE@am__append_8 = $(top_builddir)/libmp3lame/vector/liblamevectoravx512.la
-@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX2_TRUE@@WITH_XMM_TRUE@am__append_9 = $(top_builddir)/libmp3lame/vector/liblamevectoravx2.la
-@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX512_TRUE@@WITH_XMM_TRUE@am__append_10 = $(top_builddir)/libmp3lame/vector/liblamevectoravx512.la
+@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX2_TRUE@@WITH_XMM_TRUE@am__append_8 = $(top_builddir)/libmp3lame/vector/liblamevectoravx2.la
+@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX512_TRUE@@WITH_XMM_TRUE@am__append_9 = $(top_builddir)/libmp3lame/vector/liblamevectoravx512.la
+@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX2_TRUE@@WITH_XMM_TRUE@am__append_10 = $(top_builddir)/libmp3lame/vector/liblamevectoravx2.la
+@ENABLE_UNIT_TESTS_TRUE@@WITH_AVX512_TRUE@@WITH_XMM_TRUE@am__append_11 = $(top_builddir)/libmp3lame/vector/liblamevectoravx512.la
 subdir = test/unit
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/host-cpu-c-abi.m4 \
@@ -175,6 +197,14 @@ AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
+am__test_bitstream_reservoir_SOURCES_DIST =  \
+	test_bitstream_reservoir.c
+@ENABLE_UNIT_TESTS_TRUE@am_test_bitstream_reservoir_OBJECTS = test_bitstream_reservoir-test_bitstream_reservoir.$(OBJEXT)
+test_bitstream_reservoir_OBJECTS =  \
+	$(am_test_bitstream_reservoir_OBJECTS)
+@ENABLE_UNIT_TESTS_TRUE@test_bitstream_reservoir_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
 am__test_calc_sfb_noise_vector_SOURCES_DIST =  \
 	test_calc_sfb_noise_vector.c
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@am_test_calc_sfb_noise_vector_OBJECTS = test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.$(OBJEXT)
@@ -183,8 +213,8 @@ test_calc_sfb_noise_vector_OBJECTS =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_calc_sfb_noise_vector_DEPENDENCIES =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_9) \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_10)
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_10) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_11)
 am__test_choose_table_neon_SOURCES_DIST = test_choose_table_neon.c
 @ENABLE_UNIT_TESTS_TRUE@@WITH_NEON_TRUE@am_test_choose_table_neon_OBJECTS = test_choose_table_neon-test_choose_table_neon.$(OBJEXT)
 test_choose_table_neon_OBJECTS = $(am_test_choose_table_neon_OBJECTS)
@@ -199,7 +229,16 @@ test_choose_table_vector_OBJECTS =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_choose_table_vector_DEPENDENCIES =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_6)
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_7)
+am__test_classify_suffix_SOURCES_DIST = test_classify_suffix.c \
+	parse_test_stubs.c
+@ENABLE_UNIT_TESTS_TRUE@am_test_classify_suffix_OBJECTS = test_classify_suffix-test_classify_suffix.$(OBJEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_classify_suffix-parse_test_stubs.$(OBJEXT)
+test_classify_suffix_OBJECTS = $(am_test_classify_suffix_OBJECTS)
+@ENABLE_UNIT_TESTS_TRUE@test_classify_suffix_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
+@ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1)
 am__test_decode_scale_SOURCES_DIST = test_decode_scale.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_decode_scale_OBJECTS = test_decode_scale-test_decode_scale.$(OBJEXT)
 test_decode_scale_OBJECTS = $(am_test_decode_scale_OBJECTS)
@@ -216,6 +255,12 @@ test_decoder_api_OBJECTS = $(am_test_decoder_api_OBJECTS)
 @ENABLE_UNIT_TESTS_TRUE@test_decoder_api_DEPENDENCIES =  \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
+am__test_decoder_init_fail_SOURCES_DIST = test_decoder_init_fail.c
+@ENABLE_UNIT_TESTS_TRUE@am_test_decoder_init_fail_OBJECTS = test_decoder_init_fail-test_decoder_init_fail.$(OBJEXT)
+test_decoder_init_fail_OBJECTS = $(am_test_decoder_init_fail_OBJECTS)
+@ENABLE_UNIT_TESTS_TRUE@test_decoder_init_fail_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
 am__test_encode_api_SOURCES_DIST = test_encode_api.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_encode_api_OBJECTS = test_encode_api-test_encode_api.$(OBJEXT)
 test_encode_api_OBJECTS = $(am_test_encode_api_OBJECTS)
@@ -228,6 +273,15 @@ test_encode_clipgain_OBJECTS = $(am_test_encode_clipgain_OBJECTS)
 @ENABLE_UNIT_TESTS_TRUE@test_encode_clipgain_DEPENDENCIES =  \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
+am__test_encode_error_text_SOURCES_DIST = test_encode_error_text.c \
+	parse_test_stubs.c
+@ENABLE_UNIT_TESTS_TRUE@am_test_encode_error_text_OBJECTS = test_encode_error_text-test_encode_error_text.$(OBJEXT) \
+@ENABLE_UNIT_TESTS_TRUE@	test_encode_error_text-parse_test_stubs.$(OBJEXT)
+test_encode_error_text_OBJECTS = $(am_test_encode_error_text_OBJECTS)
+@ENABLE_UNIT_TESTS_TRUE@test_encode_error_text_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
+@ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1)
 am__test_encode_mono_interleaved_SOURCES_DIST =  \
 	test_encode_mono_interleaved.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_encode_mono_interleaved_OBJECTS = test_encode_mono_interleaved-test_encode_mono_interleaved.$(OBJEXT)
@@ -322,6 +376,12 @@ test_id3tag_OBJECTS = $(am_test_id3tag_OBJECTS)
 @ENABLE_UNIT_TESTS_TRUE@test_id3tag_DEPENDENCIES =  \
 @ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
+am__test_id3tag_alloc_SOURCES_DIST = test_id3tag_alloc.c
+@ENABLE_UNIT_TESTS_TRUE@am_test_id3tag_alloc_OBJECTS = test_id3tag_alloc-test_id3tag_alloc.$(OBJEXT)
+test_id3tag_alloc_OBJECTS = $(am_test_id3tag_alloc_OBJECTS)
+@ENABLE_UNIT_TESTS_TRUE@test_id3tag_alloc_DEPENDENCIES =  \
+@ENABLE_UNIT_TESTS_TRUE@	$(am__DEPENDENCIES_1) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la
 am__test_lib_info_SOURCES_DIST = test_lib_info.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_lib_info_OBJECTS =  \
 @ENABLE_UNIT_TESTS_TRUE@	test_lib_info-test_lib_info.$(OBJEXT)
@@ -363,8 +423,8 @@ test_quantize_lines_vector_OBJECTS =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_DEPENDENCIES =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__DEPENDENCIES_1) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_7) \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_8)
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_8) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_9)
 am__test_quantize_pe_SOURCES_DIST = test_quantize_pe.c
 @ENABLE_UNIT_TESTS_TRUE@am_test_quantize_pe_OBJECTS = test_quantize_pe-test_quantize_pe.$(OBJEXT)
 test_quantize_pe_OBJECTS = $(am_test_quantize_pe_OBJECTS)
@@ -447,13 +507,19 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po \
 	$(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po \
 	./$(DEPDIR)/test_bitstream_headers-test_bitstream_headers.Po \
+	./$(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Po \
 	./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po \
 	./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po \
 	./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po \
+	./$(DEPDIR)/test_classify_suffix-parse_test_stubs.Po \
+	./$(DEPDIR)/test_classify_suffix-test_classify_suffix.Po \
 	./$(DEPDIR)/test_decode_scale-test_decode_scale.Po \
 	./$(DEPDIR)/test_decoder_api-test_decoder_api.Po \
+	./$(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Po \
 	./$(DEPDIR)/test_encode_api-test_encode_api.Po \
 	./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po \
+	./$(DEPDIR)/test_encode_error_text-parse_test_stubs.Po \
+	./$(DEPDIR)/test_encode_error_text-test_encode_error_text.Po \
 	./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po \
 	./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po \
 	./$(DEPDIR)/test_file_times-test_file_times.Po \
@@ -469,6 +535,7 @@ am__depfiles_remade = $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametim
 	./$(DEPDIR)/test_help_exit-test_help_exit.Po \
 	./$(DEPDIR)/test_huffman_tables-test_huffman_tables.Po \
 	./$(DEPDIR)/test_id3tag-test_id3tag.Po \
+	./$(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Po \
 	./$(DEPDIR)/test_lib_info-test_lib_info.Po \
 	./$(DEPDIR)/test_merge_argv-parse_test_stubs.Po \
 	./$(DEPDIR)/test_merge_argv-test_merge_argv.Po \
@@ -505,32 +572,40 @@ am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
 SOURCES = $(test_bitstream_headers_SOURCES) \
+	$(test_bitstream_reservoir_SOURCES) \
 	$(test_calc_sfb_noise_vector_SOURCES) \
 	$(test_choose_table_neon_SOURCES) \
 	$(test_choose_table_vector_SOURCES) \
-	$(test_decode_scale_SOURCES) $(test_decoder_api_SOURCES) \
+	$(test_classify_suffix_SOURCES) $(test_decode_scale_SOURCES) \
+	$(test_decoder_api_SOURCES) $(test_decoder_init_fail_SOURCES) \
 	$(test_encode_api_SOURCES) $(test_encode_clipgain_SOURCES) \
+	$(test_encode_error_text_SOURCES) \
 	$(test_encode_mono_interleaved_SOURCES) \
 	$(test_encode_nonfinite_SOURCES) $(test_file_times_SOURCES) \
 	$(test_free_format_SOURCES) $(test_gain_analysis_SOURCES) \
 	$(test_get_audio_aiff_SOURCES) $(test_get_audio_float_SOURCES) \
 	$(test_get_audio_wav_SOURCES) $(test_help_exit_SOURCES) \
 	$(test_huffman_tables_SOURCES) $(test_id3tag_SOURCES) \
-	$(test_lib_info_SOURCES) $(test_merge_argv_SOURCES) \
-	$(test_parse_id3_SOURCES) $(test_parse_pathlen_SOURCES) \
+	$(test_id3tag_alloc_SOURCES) $(test_lib_info_SOURCES) \
+	$(test_merge_argv_SOURCES) $(test_parse_id3_SOURCES) \
+	$(test_parse_pathlen_SOURCES) \
 	$(test_quantize_lines_vector_SOURCES) \
 	$(test_quantize_pe_SOURCES) $(test_resample_decision_SOURCES) \
 	$(test_rtp_socket_SOURCES) $(test_sanity_SOURCES) \
 	$(test_set_get_SOURCES) $(test_totalframes_SOURCES) \
 	$(test_vector_ladder_SOURCES) $(test_vector_routines_SOURCES)
 DIST_SOURCES = $(am__test_bitstream_headers_SOURCES_DIST) \
+	$(am__test_bitstream_reservoir_SOURCES_DIST) \
 	$(am__test_calc_sfb_noise_vector_SOURCES_DIST) \
 	$(am__test_choose_table_neon_SOURCES_DIST) \
 	$(am__test_choose_table_vector_SOURCES_DIST) \
+	$(am__test_classify_suffix_SOURCES_DIST) \
 	$(am__test_decode_scale_SOURCES_DIST) \
 	$(am__test_decoder_api_SOURCES_DIST) \
+	$(am__test_decoder_init_fail_SOURCES_DIST) \
 	$(am__test_encode_api_SOURCES_DIST) \
 	$(am__test_encode_clipgain_SOURCES_DIST) \
+	$(am__test_encode_error_text_SOURCES_DIST) \
 	$(am__test_encode_mono_interleaved_SOURCES_DIST) \
 	$(am__test_encode_nonfinite_SOURCES_DIST) \
 	$(am__test_file_times_SOURCES_DIST) \
@@ -542,6 +617,7 @@ DIST_SOURCES = $(am__test_bitstream_headers_SOURCES_DIST) \
 	$(am__test_help_exit_SOURCES_DIST) \
 	$(am__test_huffman_tables_SOURCES_DIST) \
 	$(am__test_id3tag_SOURCES_DIST) \
+	$(am__test_id3tag_alloc_SOURCES_DIST) \
 	$(am__test_lib_info_SOURCES_DIST) \
 	$(am__test_merge_argv_SOURCES_DIST) \
 	$(am__test_parse_id3_SOURCES_DIST) \
@@ -971,7 +1047,7 @@ AM_CPPFLAGS = @LAME_CPPFLAGS@
 TEST_EXTENSIONS = .sh
 SH_LOG_COMPILER = $(SHELL)
 @ENABLE_UNIT_TESTS_TRUE@TESTS = $(check_PROGRAMS) test_pkgconfig.sh \
-@ENABLE_UNIT_TESTS_TRUE@	$(am__append_4)
+@ENABLE_UNIT_TESTS_TRUE@	$(am__append_4) $(am__append_5)
 
 # Every test here links libmp3lame, and every one of them has to load the copy
 # this build just produced - not one the host happens to have installed. That
@@ -1069,6 +1145,34 @@ SH_LOG_COMPILER = $(SHELL)
 @ENABLE_UNIT_TESTS_TRUE@	$(LTLIBICONV) -lm
 
 
+# The text that the frontends print for a failed encode call, in
+# frontend/parse.c; compiled in and stubbed like test_parse_pathlen.
+@ENABLE_UNIT_TESTS_TRUE@test_encode_error_text_SOURCES = test_encode_error_text.c parse_test_stubs.c
+@ENABLE_UNIT_TESTS_TRUE@test_encode_error_text_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@test_encode_error_text_LDADD = $(CMOCKA_LIBS) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
+@ENABLE_UNIT_TESTS_TRUE@	$(LTLIBICONV) -lm
+
+
+# The file name suffixes of frontend/parse.c; compiled in and stubbed like
+# test_parse_pathlen.
+@ENABLE_UNIT_TESTS_TRUE@test_classify_suffix_SOURCES = test_classify_suffix.c parse_test_stubs.c
+@ENABLE_UNIT_TESTS_TRUE@test_classify_suffix_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@test_classify_suffix_LDADD = $(CMOCKA_LIBS) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
+@ENABLE_UNIT_TESTS_TRUE@	$(LTLIBICONV) -lm
+
+
 # merge_argv() is likewise static in frontend/parse.c; same include/link setup.
 @ENABLE_UNIT_TESTS_TRUE@test_merge_argv_SOURCES = test_merge_argv.c parse_test_stubs.c
 @ENABLE_UNIT_TESTS_TRUE@test_merge_argv_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
@@ -1104,6 +1208,45 @@ SH_LOG_COMPILER = $(SHELL)
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
 @ENABLE_UNIT_TESTS_TRUE@test_id3tag_LDADD = $(CMOCKA_LIBS) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
+@ENABLE_UNIT_TESTS_TRUE@	-lm
+
+
+# The allocation test compiles id3tag.c in, with a calloc() that fails on
+# request, and takes the rest of the library from libmp3lame.
+@ENABLE_UNIT_TESTS_TRUE@test_id3tag_alloc_SOURCES = test_id3tag_alloc.c
+@ENABLE_UNIT_TESTS_TRUE@test_id3tag_alloc_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@test_id3tag_alloc_LDADD = $(CMOCKA_LIBS) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
+@ENABLE_UNIT_TESTS_TRUE@	-lm
+
+
+# The decoder start test compiles lame.c in, with a hip_decode_init() that
+# fails on request, and takes the rest of the library from libmp3lame.
+@ENABLE_UNIT_TESTS_TRUE@test_decoder_init_fail_SOURCES = test_decoder_init_fail.c
+@ENABLE_UNIT_TESTS_TRUE@test_decoder_init_fail_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@test_decoder_init_fail_LDADD = $(CMOCKA_LIBS) \
+@ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
+@ENABLE_UNIT_TESTS_TRUE@	-lm
+
+
+# The reservoir test changes an encoder's internal state, so it reads the
+# library's internal headers.
+@ENABLE_UNIT_TESTS_TRUE@test_bitstream_reservoir_SOURCES = test_bitstream_reservoir.c
+@ENABLE_UNIT_TESTS_TRUE@test_bitstream_reservoir_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
+
+@ENABLE_UNIT_TESTS_TRUE@test_bitstream_reservoir_LDADD = $(CMOCKA_LIBS) \
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
 @ENABLE_UNIT_TESTS_TRUE@	-lm
 
@@ -1167,6 +1310,7 @@ SH_LOG_COMPILER = $(SHELL)
 # property of any build.
 @ENABLE_UNIT_TESTS_TRUE@test_bitstream_headers_SOURCES = test_bitstream_headers.c
 @ENABLE_UNIT_TESTS_TRUE@test_bitstream_headers_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/test/common \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1195,6 +1339,7 @@ SH_LOG_COMPILER = $(SHELL)
 # audio five times over, and there is no shortcut that still compares streams.
 @ENABLE_UNIT_TESTS_TRUE@test_encode_api_SOURCES = test_encode_api.c
 @ENABLE_UNIT_TESTS_TRUE@test_encode_api_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/test/common \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1347,7 +1492,7 @@ SH_LOG_COMPILER = $(SHELL)
 @ENABLE_UNIT_TESTS_TRUE@	$(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
-@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir) $(am__append_5)
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir) $(am__append_6)
 @ENABLE_UNIT_TESTS_TRUE@@INTERNAL_OPTS_TRUE@test_set_get_LDFLAGS = -static
 @ENABLE_UNIT_TESTS_TRUE@test_set_get_LDADD = $(CMOCKA_LIBS) \
 @ENABLE_UNIT_TESTS_TRUE@	$(top_builddir)/libmp3lame/libmp3lame.la \
@@ -1367,7 +1512,7 @@ SH_LOG_COMPILER = $(SHELL)
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_choose_table_vector_LDADD =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(CMOCKA_LIBS) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_6)
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_7)
 
 # Same arrangement for the quantization loop, and for the same reason.
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_SOURCES = test_quantize_lines_vector.c
@@ -1379,8 +1524,8 @@ SH_LOG_COMPILER = $(SHELL)
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_quantize_lines_vector_LDADD =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(CMOCKA_LIBS) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-lm $(am__append_7) \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_8)
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-lm $(am__append_8) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_9)
 
 # The VBR scalefactor-band noise gets the same arrangement, minus the AVX-512
 # library: that routine was measured on hardware that has AVX-512, found to cost
@@ -1394,12 +1539,12 @@ SH_LOG_COMPILER = $(SHELL)
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@test_calc_sfb_noise_vector_LDADD =  \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(CMOCKA_LIBS) \
 @ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(top_builddir)/libmp3lame/vector/liblamevectorroutines.la \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-lm $(am__append_9) \
-@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_10)
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	-lm $(am__append_10) \
+@ENABLE_UNIT_TESTS_TRUE@@WITH_XMM_TRUE@	$(am__append_11)
 
 # The ARM tier carries one routine, so it gets one test program rather than an
-# arm of the x86 file - that one names the SSE2 and AVX2 routines throughout, so
-# there is no shared body to add to.
+# arm of the x86 file, which tests four. The escape cases that both programs run
+# are in test_esc_cases.h.
 #
 # OUTSIDE the WITH_XMM block above, which is the whole point: the first version
 # of this sat inside it, so on an ARM host - where WITH_XMM is false - the
@@ -1442,6 +1587,7 @@ SH_LOG_COMPILER = $(SHELL)
 @ENABLE_UNIT_TESTS_TRUE@test_file_times_SOURCES = test_file_times.c $(top_srcdir)/frontend/lametime.c
 @ENABLE_UNIT_TESTS_TRUE@test_file_times_CPPFLAGS = $(AM_CPPFLAGS) $(CMOCKA_CFLAGS) \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/frontend \
+@ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/libmp3lame \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_srcdir)/include \
 @ENABLE_UNIT_TESTS_TRUE@	-I$(top_builddir)
 
@@ -1464,18 +1610,23 @@ SH_LOG_COMPILER = $(SHELL)
 # Kept in the tarball whether or not this build configured the vector code,
 # so a dist made on one architecture still carries the tests for another.
 
-# Header-only unused-parameter marker shared by the tests; not a _SOURCES file,
-# so it has to be named for the tarball explicitly.
+# Headers shared by the tests; they are not _SOURCES files, so they have to be
+# named for the tarball explicitly.
 
 # Likewise the pkg-config test: it is a TESTS entry rather than a _SOURCES
 # file, and it is inside the --enable-unit-tests conditional, so neither route
 # would put it in the tarball on its own.
 
-# And the exit-status test, for the same two reasons.
+# And the frontend tests, for the same two reasons.
 EXTRA_DIST = test_choose_table_vector.c test_quantize_lines_vector.c \
 	test_calc_sfb_noise_vector.c test_choose_table_neon.c \
-	test_rtp_socket.c test_unused.h test_pkgconfig.sh \
-	test_exit_status.sh
+	test_rtp_socket.c test_unused.h test_fixture.h test_mem.h \
+	test_esc_cases.h test_cpu_probe.h test_bytes.h test_report.h \
+	test_float_bits.h test_encode.h test_pkgconfig.sh \
+	test_exit_status.sh test_swap_channel.sh test_pipe_length.sh \
+	test_mp3rtp_status.sh test_preset_range.sh test_nogap_files.sh \
+	test_brhist_cbr.sh test_nogap_failures.sh test_decode_swap.sh \
+	test_preserve_modtime.sh \n test_output_complete.sh
 all: all-am
 
 .SUFFIXES:
@@ -1519,6 +1670,10 @@ test_bitstream_headers$(EXEEXT): $(test_bitstream_headers_OBJECTS) $(test_bitstr
 	@rm -f test_bitstream_headers$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_bitstream_headers_OBJECTS) $(test_bitstream_headers_LDADD) $(LIBS)
 
+test_bitstream_reservoir$(EXEEXT): $(test_bitstream_reservoir_OBJECTS) $(test_bitstream_reservoir_DEPENDENCIES) $(EXTRA_test_bitstream_reservoir_DEPENDENCIES) 
+	@rm -f test_bitstream_reservoir$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_bitstream_reservoir_OBJECTS) $(test_bitstream_reservoir_LDADD) $(LIBS)
+
 test_calc_sfb_noise_vector$(EXEEXT): $(test_calc_sfb_noise_vector_OBJECTS) $(test_calc_sfb_noise_vector_DEPENDENCIES) $(EXTRA_test_calc_sfb_noise_vector_DEPENDENCIES) 
 	@rm -f test_calc_sfb_noise_vector$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_calc_sfb_noise_vector_OBJECTS) $(test_calc_sfb_noise_vector_LDADD) $(LIBS)
@@ -1531,6 +1686,10 @@ test_choose_table_vector$(EXEEXT): $(test_choose_table_vector_OBJECTS) $(test_ch
 	@rm -f test_choose_table_vector$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_choose_table_vector_OBJECTS) $(test_choose_table_vector_LDADD) $(LIBS)
 
+test_classify_suffix$(EXEEXT): $(test_classify_suffix_OBJECTS) $(test_classify_suffix_DEPENDENCIES) $(EXTRA_test_classify_suffix_DEPENDENCIES) 
+	@rm -f test_classify_suffix$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_classify_suffix_OBJECTS) $(test_classify_suffix_LDADD) $(LIBS)
+
 test_decode_scale$(EXEEXT): $(test_decode_scale_OBJECTS) $(test_decode_scale_DEPENDENCIES) $(EXTRA_test_decode_scale_DEPENDENCIES) 
 	@rm -f test_decode_scale$(EXEEXT)
 	$(AM_V_CCLD)$(test_decode_scale_LINK) $(test_decode_scale_OBJECTS) $(test_decode_scale_LDADD) $(LIBS)
@@ -1539,6 +1698,10 @@ test_decoder_api$(EXEEXT): $(test_decoder_api_OBJECTS) $(test_decoder_api_DEPEND
 	@rm -f test_decoder_api$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_decoder_api_OBJECTS) $(test_decoder_api_LDADD) $(LIBS)
 
+test_decoder_init_fail$(EXEEXT): $(test_decoder_init_fail_OBJECTS) $(test_decoder_init_fail_DEPENDENCIES) $(EXTRA_test_decoder_init_fail_DEPENDENCIES) 
+	@rm -f test_decoder_init_fail$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_decoder_init_fail_OBJECTS) $(test_decoder_init_fail_LDADD) $(LIBS)
+
 test_encode_api$(EXEEXT): $(test_encode_api_OBJECTS) $(test_encode_api_DEPENDENCIES) $(EXTRA_test_encode_api_DEPENDENCIES) 
 	@rm -f test_encode_api$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_encode_api_OBJECTS) $(test_encode_api_LDADD) $(LIBS)
@@ -1546,6 +1709,10 @@ test_encode_api$(EXEEXT): $(test_encode_api_OBJECTS) $(test_encode_api_DEPENDENC
 test_encode_clipgain$(EXEEXT): $(test_encode_clipgain_OBJECTS) $(test_encode_clipgain_DEPENDENCIES) $(EXTRA_test_encode_clipgain_DEPENDENCIES) 
 	@rm -f test_encode_clipgain$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_encode_clipgain_OBJECTS) $(test_encode_clipgain_LDADD) $(LIBS)
+
+test_encode_error_text$(EXEEXT): $(test_encode_error_text_OBJECTS) $(test_encode_error_text_DEPENDENCIES) $(EXTRA_test_encode_error_text_DEPENDENCIES) 
+	@rm -f test_encode_error_text$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_encode_error_text_OBJECTS) $(test_encode_error_text_LDADD) $(LIBS)
 
 test_encode_mono_interleaved$(EXEEXT): $(test_encode_mono_interleaved_OBJECTS) $(test_encode_mono_interleaved_DEPENDENCIES) $(EXTRA_test_encode_mono_interleaved_DEPENDENCIES) 
 	@rm -f test_encode_mono_interleaved$(EXEEXT)
@@ -1599,6 +1766,10 @@ test_huffman_tables$(EXEEXT): $(test_huffman_tables_OBJECTS) $(test_huffman_tabl
 test_id3tag$(EXEEXT): $(test_id3tag_OBJECTS) $(test_id3tag_DEPENDENCIES) $(EXTRA_test_id3tag_DEPENDENCIES) 
 	@rm -f test_id3tag$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(test_id3tag_OBJECTS) $(test_id3tag_LDADD) $(LIBS)
+
+test_id3tag_alloc$(EXEEXT): $(test_id3tag_alloc_OBJECTS) $(test_id3tag_alloc_DEPENDENCIES) $(EXTRA_test_id3tag_alloc_DEPENDENCIES) 
+	@rm -f test_id3tag_alloc$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(test_id3tag_alloc_OBJECTS) $(test_id3tag_alloc_LDADD) $(LIBS)
 
 test_lib_info$(EXEEXT): $(test_lib_info_OBJECTS) $(test_lib_info_DEPENDENCIES) $(EXTRA_test_lib_info_DEPENDENCIES) 
 	@rm -f test_lib_info$(EXEEXT)
@@ -1665,13 +1836,19 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@$(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_bitstream_headers-test_bitstream_headers.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_classify_suffix-parse_test_stubs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_classify_suffix-test_classify_suffix.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_decode_scale-test_decode_scale.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_decoder_api-test_decoder_api.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_api-test_encode_api.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_error_text-parse_test_stubs.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_error_text-test_encode_error_text.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_file_times-test_file_times.Po@am__quote@ # am--include-marker
@@ -1687,6 +1864,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_help_exit-test_help_exit.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_huffman_tables-test_huffman_tables.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_id3tag-test_id3tag.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_lib_info-test_lib_info.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_merge_argv-parse_test_stubs.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_merge_argv-test_merge_argv.Po@am__quote@ # am--include-marker
@@ -1748,6 +1926,20 @@ test_bitstream_headers-test_bitstream_headers.obj: test_bitstream_headers.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_bitstream_headers_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_bitstream_headers-test_bitstream_headers.obj `if test -f 'test_bitstream_headers.c'; then $(CYGPATH_W) 'test_bitstream_headers.c'; else $(CYGPATH_W) '$(srcdir)/test_bitstream_headers.c'; fi`
 
+test_bitstream_reservoir-test_bitstream_reservoir.o: test_bitstream_reservoir.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_bitstream_reservoir_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_bitstream_reservoir-test_bitstream_reservoir.o -MD -MP -MF $(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Tpo -c -o test_bitstream_reservoir-test_bitstream_reservoir.o `test -f 'test_bitstream_reservoir.c' || echo '$(srcdir)/'`test_bitstream_reservoir.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Tpo $(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_bitstream_reservoir.c' object='test_bitstream_reservoir-test_bitstream_reservoir.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_bitstream_reservoir_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_bitstream_reservoir-test_bitstream_reservoir.o `test -f 'test_bitstream_reservoir.c' || echo '$(srcdir)/'`test_bitstream_reservoir.c
+
+test_bitstream_reservoir-test_bitstream_reservoir.obj: test_bitstream_reservoir.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_bitstream_reservoir_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_bitstream_reservoir-test_bitstream_reservoir.obj -MD -MP -MF $(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Tpo -c -o test_bitstream_reservoir-test_bitstream_reservoir.obj `if test -f 'test_bitstream_reservoir.c'; then $(CYGPATH_W) 'test_bitstream_reservoir.c'; else $(CYGPATH_W) '$(srcdir)/test_bitstream_reservoir.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Tpo $(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_bitstream_reservoir.c' object='test_bitstream_reservoir-test_bitstream_reservoir.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_bitstream_reservoir_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_bitstream_reservoir-test_bitstream_reservoir.obj `if test -f 'test_bitstream_reservoir.c'; then $(CYGPATH_W) 'test_bitstream_reservoir.c'; else $(CYGPATH_W) '$(srcdir)/test_bitstream_reservoir.c'; fi`
+
 test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.o: test_calc_sfb_noise_vector.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_calc_sfb_noise_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.o -MD -MP -MF $(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Tpo -c -o test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.o `test -f 'test_calc_sfb_noise_vector.c' || echo '$(srcdir)/'`test_calc_sfb_noise_vector.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Tpo $(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
@@ -1790,6 +1982,34 @@ test_choose_table_vector-test_choose_table_vector.obj: test_choose_table_vector.
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_choose_table_vector_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_choose_table_vector-test_choose_table_vector.obj `if test -f 'test_choose_table_vector.c'; then $(CYGPATH_W) 'test_choose_table_vector.c'; else $(CYGPATH_W) '$(srcdir)/test_choose_table_vector.c'; fi`
 
+test_classify_suffix-test_classify_suffix.o: test_classify_suffix.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_classify_suffix_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_classify_suffix-test_classify_suffix.o -MD -MP -MF $(DEPDIR)/test_classify_suffix-test_classify_suffix.Tpo -c -o test_classify_suffix-test_classify_suffix.o `test -f 'test_classify_suffix.c' || echo '$(srcdir)/'`test_classify_suffix.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_classify_suffix-test_classify_suffix.Tpo $(DEPDIR)/test_classify_suffix-test_classify_suffix.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_classify_suffix.c' object='test_classify_suffix-test_classify_suffix.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_classify_suffix_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_classify_suffix-test_classify_suffix.o `test -f 'test_classify_suffix.c' || echo '$(srcdir)/'`test_classify_suffix.c
+
+test_classify_suffix-test_classify_suffix.obj: test_classify_suffix.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_classify_suffix_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_classify_suffix-test_classify_suffix.obj -MD -MP -MF $(DEPDIR)/test_classify_suffix-test_classify_suffix.Tpo -c -o test_classify_suffix-test_classify_suffix.obj `if test -f 'test_classify_suffix.c'; then $(CYGPATH_W) 'test_classify_suffix.c'; else $(CYGPATH_W) '$(srcdir)/test_classify_suffix.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_classify_suffix-test_classify_suffix.Tpo $(DEPDIR)/test_classify_suffix-test_classify_suffix.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_classify_suffix.c' object='test_classify_suffix-test_classify_suffix.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_classify_suffix_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_classify_suffix-test_classify_suffix.obj `if test -f 'test_classify_suffix.c'; then $(CYGPATH_W) 'test_classify_suffix.c'; else $(CYGPATH_W) '$(srcdir)/test_classify_suffix.c'; fi`
+
+test_classify_suffix-parse_test_stubs.o: parse_test_stubs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_classify_suffix_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_classify_suffix-parse_test_stubs.o -MD -MP -MF $(DEPDIR)/test_classify_suffix-parse_test_stubs.Tpo -c -o test_classify_suffix-parse_test_stubs.o `test -f 'parse_test_stubs.c' || echo '$(srcdir)/'`parse_test_stubs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_classify_suffix-parse_test_stubs.Tpo $(DEPDIR)/test_classify_suffix-parse_test_stubs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='parse_test_stubs.c' object='test_classify_suffix-parse_test_stubs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_classify_suffix_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_classify_suffix-parse_test_stubs.o `test -f 'parse_test_stubs.c' || echo '$(srcdir)/'`parse_test_stubs.c
+
+test_classify_suffix-parse_test_stubs.obj: parse_test_stubs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_classify_suffix_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_classify_suffix-parse_test_stubs.obj -MD -MP -MF $(DEPDIR)/test_classify_suffix-parse_test_stubs.Tpo -c -o test_classify_suffix-parse_test_stubs.obj `if test -f 'parse_test_stubs.c'; then $(CYGPATH_W) 'parse_test_stubs.c'; else $(CYGPATH_W) '$(srcdir)/parse_test_stubs.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_classify_suffix-parse_test_stubs.Tpo $(DEPDIR)/test_classify_suffix-parse_test_stubs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='parse_test_stubs.c' object='test_classify_suffix-parse_test_stubs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_classify_suffix_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_classify_suffix-parse_test_stubs.obj `if test -f 'parse_test_stubs.c'; then $(CYGPATH_W) 'parse_test_stubs.c'; else $(CYGPATH_W) '$(srcdir)/parse_test_stubs.c'; fi`
+
 test_decode_scale-test_decode_scale.o: test_decode_scale.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decode_scale_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_decode_scale-test_decode_scale.o -MD -MP -MF $(DEPDIR)/test_decode_scale-test_decode_scale.Tpo -c -o test_decode_scale-test_decode_scale.o `test -f 'test_decode_scale.c' || echo '$(srcdir)/'`test_decode_scale.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_decode_scale-test_decode_scale.Tpo $(DEPDIR)/test_decode_scale-test_decode_scale.Po
@@ -1818,6 +2038,20 @@ test_decoder_api-test_decoder_api.obj: test_decoder_api.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decoder_api_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_decoder_api-test_decoder_api.obj `if test -f 'test_decoder_api.c'; then $(CYGPATH_W) 'test_decoder_api.c'; else $(CYGPATH_W) '$(srcdir)/test_decoder_api.c'; fi`
 
+test_decoder_init_fail-test_decoder_init_fail.o: test_decoder_init_fail.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decoder_init_fail_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_decoder_init_fail-test_decoder_init_fail.o -MD -MP -MF $(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Tpo -c -o test_decoder_init_fail-test_decoder_init_fail.o `test -f 'test_decoder_init_fail.c' || echo '$(srcdir)/'`test_decoder_init_fail.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Tpo $(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_decoder_init_fail.c' object='test_decoder_init_fail-test_decoder_init_fail.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decoder_init_fail_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_decoder_init_fail-test_decoder_init_fail.o `test -f 'test_decoder_init_fail.c' || echo '$(srcdir)/'`test_decoder_init_fail.c
+
+test_decoder_init_fail-test_decoder_init_fail.obj: test_decoder_init_fail.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decoder_init_fail_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_decoder_init_fail-test_decoder_init_fail.obj -MD -MP -MF $(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Tpo -c -o test_decoder_init_fail-test_decoder_init_fail.obj `if test -f 'test_decoder_init_fail.c'; then $(CYGPATH_W) 'test_decoder_init_fail.c'; else $(CYGPATH_W) '$(srcdir)/test_decoder_init_fail.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Tpo $(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_decoder_init_fail.c' object='test_decoder_init_fail-test_decoder_init_fail.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_decoder_init_fail_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_decoder_init_fail-test_decoder_init_fail.obj `if test -f 'test_decoder_init_fail.c'; then $(CYGPATH_W) 'test_decoder_init_fail.c'; else $(CYGPATH_W) '$(srcdir)/test_decoder_init_fail.c'; fi`
+
 test_encode_api-test_encode_api.o: test_encode_api.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_api_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_encode_api-test_encode_api.o -MD -MP -MF $(DEPDIR)/test_encode_api-test_encode_api.Tpo -c -o test_encode_api-test_encode_api.o `test -f 'test_encode_api.c' || echo '$(srcdir)/'`test_encode_api.c
 @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_encode_api-test_encode_api.Tpo $(DEPDIR)/test_encode_api-test_encode_api.Po
@@ -1845,6 +2079,34 @@ test_encode_clipgain-test_encode_clipgain.obj: test_encode_clipgain.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_encode_clipgain.c' object='test_encode_clipgain-test_encode_clipgain.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_clipgain_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_encode_clipgain-test_encode_clipgain.obj `if test -f 'test_encode_clipgain.c'; then $(CYGPATH_W) 'test_encode_clipgain.c'; else $(CYGPATH_W) '$(srcdir)/test_encode_clipgain.c'; fi`
+
+test_encode_error_text-test_encode_error_text.o: test_encode_error_text.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_error_text_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_encode_error_text-test_encode_error_text.o -MD -MP -MF $(DEPDIR)/test_encode_error_text-test_encode_error_text.Tpo -c -o test_encode_error_text-test_encode_error_text.o `test -f 'test_encode_error_text.c' || echo '$(srcdir)/'`test_encode_error_text.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_encode_error_text-test_encode_error_text.Tpo $(DEPDIR)/test_encode_error_text-test_encode_error_text.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_encode_error_text.c' object='test_encode_error_text-test_encode_error_text.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_error_text_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_encode_error_text-test_encode_error_text.o `test -f 'test_encode_error_text.c' || echo '$(srcdir)/'`test_encode_error_text.c
+
+test_encode_error_text-test_encode_error_text.obj: test_encode_error_text.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_error_text_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_encode_error_text-test_encode_error_text.obj -MD -MP -MF $(DEPDIR)/test_encode_error_text-test_encode_error_text.Tpo -c -o test_encode_error_text-test_encode_error_text.obj `if test -f 'test_encode_error_text.c'; then $(CYGPATH_W) 'test_encode_error_text.c'; else $(CYGPATH_W) '$(srcdir)/test_encode_error_text.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_encode_error_text-test_encode_error_text.Tpo $(DEPDIR)/test_encode_error_text-test_encode_error_text.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_encode_error_text.c' object='test_encode_error_text-test_encode_error_text.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_error_text_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_encode_error_text-test_encode_error_text.obj `if test -f 'test_encode_error_text.c'; then $(CYGPATH_W) 'test_encode_error_text.c'; else $(CYGPATH_W) '$(srcdir)/test_encode_error_text.c'; fi`
+
+test_encode_error_text-parse_test_stubs.o: parse_test_stubs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_error_text_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_encode_error_text-parse_test_stubs.o -MD -MP -MF $(DEPDIR)/test_encode_error_text-parse_test_stubs.Tpo -c -o test_encode_error_text-parse_test_stubs.o `test -f 'parse_test_stubs.c' || echo '$(srcdir)/'`parse_test_stubs.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_encode_error_text-parse_test_stubs.Tpo $(DEPDIR)/test_encode_error_text-parse_test_stubs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='parse_test_stubs.c' object='test_encode_error_text-parse_test_stubs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_error_text_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_encode_error_text-parse_test_stubs.o `test -f 'parse_test_stubs.c' || echo '$(srcdir)/'`parse_test_stubs.c
+
+test_encode_error_text-parse_test_stubs.obj: parse_test_stubs.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_error_text_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_encode_error_text-parse_test_stubs.obj -MD -MP -MF $(DEPDIR)/test_encode_error_text-parse_test_stubs.Tpo -c -o test_encode_error_text-parse_test_stubs.obj `if test -f 'parse_test_stubs.c'; then $(CYGPATH_W) 'parse_test_stubs.c'; else $(CYGPATH_W) '$(srcdir)/parse_test_stubs.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_encode_error_text-parse_test_stubs.Tpo $(DEPDIR)/test_encode_error_text-parse_test_stubs.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='parse_test_stubs.c' object='test_encode_error_text-parse_test_stubs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_error_text_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_encode_error_text-parse_test_stubs.obj `if test -f 'parse_test_stubs.c'; then $(CYGPATH_W) 'parse_test_stubs.c'; else $(CYGPATH_W) '$(srcdir)/parse_test_stubs.c'; fi`
 
 test_encode_mono_interleaved-test_encode_mono_interleaved.o: test_encode_mono_interleaved.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_encode_mono_interleaved_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_encode_mono_interleaved-test_encode_mono_interleaved.o -MD -MP -MF $(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Tpo -c -o test_encode_mono_interleaved-test_encode_mono_interleaved.o `test -f 'test_encode_mono_interleaved.c' || echo '$(srcdir)/'`test_encode_mono_interleaved.c
@@ -2069,6 +2331,20 @@ test_id3tag-test_id3tag.obj: test_id3tag.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_id3tag.c' object='test_id3tag-test_id3tag.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_id3tag_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_id3tag-test_id3tag.obj `if test -f 'test_id3tag.c'; then $(CYGPATH_W) 'test_id3tag.c'; else $(CYGPATH_W) '$(srcdir)/test_id3tag.c'; fi`
+
+test_id3tag_alloc-test_id3tag_alloc.o: test_id3tag_alloc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_id3tag_alloc_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_id3tag_alloc-test_id3tag_alloc.o -MD -MP -MF $(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Tpo -c -o test_id3tag_alloc-test_id3tag_alloc.o `test -f 'test_id3tag_alloc.c' || echo '$(srcdir)/'`test_id3tag_alloc.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Tpo $(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_id3tag_alloc.c' object='test_id3tag_alloc-test_id3tag_alloc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_id3tag_alloc_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_id3tag_alloc-test_id3tag_alloc.o `test -f 'test_id3tag_alloc.c' || echo '$(srcdir)/'`test_id3tag_alloc.c
+
+test_id3tag_alloc-test_id3tag_alloc.obj: test_id3tag_alloc.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_id3tag_alloc_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_id3tag_alloc-test_id3tag_alloc.obj -MD -MP -MF $(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Tpo -c -o test_id3tag_alloc-test_id3tag_alloc.obj `if test -f 'test_id3tag_alloc.c'; then $(CYGPATH_W) 'test_id3tag_alloc.c'; else $(CYGPATH_W) '$(srcdir)/test_id3tag_alloc.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Tpo $(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='test_id3tag_alloc.c' object='test_id3tag_alloc-test_id3tag_alloc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_id3tag_alloc_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o test_id3tag_alloc-test_id3tag_alloc.obj `if test -f 'test_id3tag_alloc.c'; then $(CYGPATH_W) 'test_id3tag_alloc.c'; else $(CYGPATH_W) '$(srcdir)/test_id3tag_alloc.c'; fi`
 
 test_lib_info-test_lib_info.o: test_lib_info.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_lib_info_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT test_lib_info-test_lib_info.o -MD -MP -MF $(DEPDIR)/test_lib_info-test_lib_info.Tpo -c -o test_lib_info-test_lib_info.o `test -f 'test_lib_info.c' || echo '$(srcdir)/'`test_lib_info.c
@@ -2567,6 +2843,20 @@ test_parse_pathlen.log: test_parse_pathlen$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_encode_error_text.log: test_encode_error_text$(EXEEXT)
+	@p='test_encode_error_text$(EXEEXT)'; \
+	b='test_encode_error_text'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_classify_suffix.log: test_classify_suffix$(EXEEXT)
+	@p='test_classify_suffix$(EXEEXT)'; \
+	b='test_classify_suffix'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 test_merge_argv.log: test_merge_argv$(EXEEXT)
 	@p='test_merge_argv$(EXEEXT)'; \
 	b='test_merge_argv'; \
@@ -2577,6 +2867,13 @@ test_merge_argv.log: test_merge_argv$(EXEEXT)
 test_id3tag.log: test_id3tag$(EXEEXT)
 	@p='test_id3tag$(EXEEXT)'; \
 	b='test_id3tag'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_id3tag_alloc.log: test_id3tag_alloc$(EXEEXT)
+	@p='test_id3tag_alloc$(EXEEXT)'; \
+	b='test_id3tag_alloc'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -2721,6 +3018,20 @@ test_gain_analysis.log: test_gain_analysis$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_decoder_init_fail.log: test_decoder_init_fail$(EXEEXT)
+	@p='test_decoder_init_fail$(EXEEXT)'; \
+	b='test_decoder_init_fail'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
+test_bitstream_reservoir.log: test_bitstream_reservoir$(EXEEXT)
+	@p='test_bitstream_reservoir$(EXEEXT)'; \
+	b='test_bitstream_reservoir'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 test_choose_table_vector.log: test_choose_table_vector$(EXEEXT)
 	@p='test_choose_table_vector$(EXEEXT)'; \
 	b='test_choose_table_vector'; \
@@ -2855,13 +3166,19 @@ distclean: distclean-am
 	-rm -f $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po
 	-rm -f $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po
 	-rm -f ./$(DEPDIR)/test_bitstream_headers-test_bitstream_headers.Po
+	-rm -f ./$(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Po
 	-rm -f ./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po
+	-rm -f ./$(DEPDIR)/test_classify_suffix-parse_test_stubs.Po
+	-rm -f ./$(DEPDIR)/test_classify_suffix-test_classify_suffix.Po
 	-rm -f ./$(DEPDIR)/test_decode_scale-test_decode_scale.Po
 	-rm -f ./$(DEPDIR)/test_decoder_api-test_decoder_api.Po
+	-rm -f ./$(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Po
 	-rm -f ./$(DEPDIR)/test_encode_api-test_encode_api.Po
 	-rm -f ./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po
+	-rm -f ./$(DEPDIR)/test_encode_error_text-parse_test_stubs.Po
+	-rm -f ./$(DEPDIR)/test_encode_error_text-test_encode_error_text.Po
 	-rm -f ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po
 	-rm -f ./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po
 	-rm -f ./$(DEPDIR)/test_file_times-test_file_times.Po
@@ -2877,6 +3194,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/test_help_exit-test_help_exit.Po
 	-rm -f ./$(DEPDIR)/test_huffman_tables-test_huffman_tables.Po
 	-rm -f ./$(DEPDIR)/test_id3tag-test_id3tag.Po
+	-rm -f ./$(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Po
 	-rm -f ./$(DEPDIR)/test_lib_info-test_lib_info.Po
 	-rm -f ./$(DEPDIR)/test_merge_argv-parse_test_stubs.Po
 	-rm -f ./$(DEPDIR)/test_merge_argv-test_merge_argv.Po
@@ -2941,13 +3259,19 @@ maintainer-clean: maintainer-clean-am
 	-rm -f $(top_builddir)/frontend/$(DEPDIR)/test_file_times-lametime.Po
 	-rm -f $(top_builddir)/frontend/$(DEPDIR)/test_rtp_socket-rtp.Po
 	-rm -f ./$(DEPDIR)/test_bitstream_headers-test_bitstream_headers.Po
+	-rm -f ./$(DEPDIR)/test_bitstream_reservoir-test_bitstream_reservoir.Po
 	-rm -f ./$(DEPDIR)/test_calc_sfb_noise_vector-test_calc_sfb_noise_vector.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_neon-test_choose_table_neon.Po
 	-rm -f ./$(DEPDIR)/test_choose_table_vector-test_choose_table_vector.Po
+	-rm -f ./$(DEPDIR)/test_classify_suffix-parse_test_stubs.Po
+	-rm -f ./$(DEPDIR)/test_classify_suffix-test_classify_suffix.Po
 	-rm -f ./$(DEPDIR)/test_decode_scale-test_decode_scale.Po
 	-rm -f ./$(DEPDIR)/test_decoder_api-test_decoder_api.Po
+	-rm -f ./$(DEPDIR)/test_decoder_init_fail-test_decoder_init_fail.Po
 	-rm -f ./$(DEPDIR)/test_encode_api-test_encode_api.Po
 	-rm -f ./$(DEPDIR)/test_encode_clipgain-test_encode_clipgain.Po
+	-rm -f ./$(DEPDIR)/test_encode_error_text-parse_test_stubs.Po
+	-rm -f ./$(DEPDIR)/test_encode_error_text-test_encode_error_text.Po
 	-rm -f ./$(DEPDIR)/test_encode_mono_interleaved-test_encode_mono_interleaved.Po
 	-rm -f ./$(DEPDIR)/test_encode_nonfinite-test_encode_nonfinite.Po
 	-rm -f ./$(DEPDIR)/test_file_times-test_file_times.Po
@@ -2963,6 +3287,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/test_help_exit-test_help_exit.Po
 	-rm -f ./$(DEPDIR)/test_huffman_tables-test_huffman_tables.Po
 	-rm -f ./$(DEPDIR)/test_id3tag-test_id3tag.Po
+	-rm -f ./$(DEPDIR)/test_id3tag_alloc-test_id3tag_alloc.Po
 	-rm -f ./$(DEPDIR)/test_lib_info-test_lib_info.Po
 	-rm -f ./$(DEPDIR)/test_merge_argv-parse_test_stubs.Po
 	-rm -f ./$(DEPDIR)/test_merge_argv-test_merge_argv.Po
