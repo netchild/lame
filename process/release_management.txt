@@ -1,5 +1,23 @@
-- SF-net - project - files - create folder (version = name of folder), enable "staged"
-- make sure libmp3lame/version.h mentions the right version and release instead of alpha/beta (commit if not)
+Needed: svn2cl, CMocka and the libraries in doc/maintainer-build-matrix.md.
+On Windows, run maintainer\setup-windows-deps.ps1 once.
+
+Names used below, for version X.Y (patch release: X.Y.N):
+  $VERSION  X.Y, or X.Y.N for a patch release, e.g. 4.1 or 3.99.5
+  $TAG      $VERSION with "_" for ".", e.g. 4_1 or 3_99_5
+
+- set the version and commit:
+    libmp3lame/version.h: LAME_MAJOR_VERSION X, LAME_MINOR_VERSION Y,
+      LAME_TYPE_VERSION 2, LAME_PATCH_VERSION 0 (patch release: N)
+    configure.ac: AC_INIT([lame],[$VERSION],...), then run autoconf to
+      regenerate configure. There is no alpha or beta in this name: LAME 4.1
+      beta is 4.1 here, only LAME_TYPE_VERSION says beta.
+    doc/man/lame.1, doc/man/mp3rtp.1 and doc/man/mp3x.1: in the first line, the
+      release date as "Month DD, YYYY" and "LAME $VERSION", e.g.
+      .TH lame 1 "November 05, 2026" "LAME 4.1" "LAME audio compressor"
+- check the documents generated from the HTML and the parser:
+    python3 maintainer/gen-usage.py --check
+    python3 maintainer/check-optdoc.py
+  If USAGE is stale, run gen-usage.py without --check and commit.
 - test build: run the build-configuration matrix, on a POSIX system and on
   Windows. The driver builds every cell, does not stop at the first failure,
   and exits non-zero if any cell failed; each build's log is under logs/ in
@@ -7,7 +25,7 @@
     sh maintainer/gen-build-matrix.sh -d ../build-matrix -x --enable-unit-tests
     sh ../build-matrix/build-all.sh
   and on Windows:
-    pwsh maintainer\gen-build-matrix.ps1 -Dir ..\build-matrix
+    pwsh maintainer\gen-build-matrix.ps1 -Dir ..\build-matrix -Arch "x64,x86"
     pwsh ..\build-matrix\build-all.ps1
   "-x --enable-unit-tests" appends that option to every cell, so each
   configuration is tested and not only built. It needs CMocka, and nothing
@@ -16,22 +34,27 @@
   missing is skipped rather than failed, and matrix-info.txt says which - read
   that before taking a short matrix for a clean one.
   See doc/maintainer-build-matrix.md for the cells and the prerequisites.
-- make test
-- copy testcase.new.mp3 to tescase.mp3 and commit
+- in ../build-matrix/<compiler>/full: make testupdate, and commit testcase.mp3
 - update doc/html/history.html (release date, important changes) and commit
 - create ChangeLog (run make_changelog.sh) and commit
-- tag the release, e.g. for lame-3.100:
-    svn copy --username=$USERNAME svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/trunk/lame svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/tags/lame3_100
-    svn copy --username=$USERNAME svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/trunk/lame svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/tags/RELEASE__3_100
-- TBD: delete all files if in separate build directory and re-build (to get new ChangeLog)?
-- make dist
+- determine $REVISION, at the top of the source tree:
+    svn update
+    svn status
+    svnversion
+  svn status must print nothing. svnversion must print a plain number, and
+  that number is $REVISION. "7136M" means a local change and "7130:7136" a
+  tree that is not at one revision; fix that, and do not use "svn info", which
+  still names the old revision right after a commit. Any later commit to
+  trunk/lame means starting again from this step.
+- in ../build-matrix/<compiler>/full: make dist
 - validate the tarball with check-dist, on a POSIX system and on Windows. It
   reads nothing from the tree the tarball was rolled from - the build harness,
   the source, the man pages and the ABI contract all come out of the tarball,
   because a file missing from it is exactly the defect this is looking for.
     sh maintainer/check-dist.sh lame-<version>.tar.gz /tmp/distcheck
   and on Windows:
-    pwsh maintainer\check-dist.ps1 lame-<version>.tar.gz C:\temp\distcheck
+    pwsh maintainer\check-dist.ps1 lame-<version>.tar.gz C:\temp\distcheck -Arch "x64,x86" -Mpg123Dir vc_solution\mpg123 -LibsndfileDir vc_solution\libsndfile -GtkDir vc_solution\gtk4\x64 -DShowBaseClassesDir vc_solution\baseclasses
+  The options name the optional libraries, which are not in the tarball.
   "make distcheck" is one of its checks - a VPATH build, install, installcheck,
   uninstall and re-dist - so that does not have to be run separately. Every
   check reports PASS, FAIL, SKIP or N/A and the run continues to the end; only
@@ -42,15 +65,21 @@
   native Windows build.
   See doc/maintainer-check-dist.md for the full check list and the opt-in
   flags (--maintainer-mode, --audio-dir, --coverage, --sanitizers).
-- upload lame-<version>.tar.gz to the version directory create above
-- click on the (i) button of the uploaded file, change "Default Download For" (select all, deselct Android)
-- fill "Download Button:" with "<version> source ode"
+- tag the revision that was validated:
+    svn copy -r $REVISION --username=$USERNAME svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/trunk/lame svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/tags/lame$TAG
+    svn copy -r $REVISION --username=$USERNAME svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/trunk/lame svn+ssh://$USERNAME@svn.code.sf.net/p/lame/svn/tags/RELEASE__$TAG
+- SF-net - project - files - create folder (version = name of folder), enable "staged"
+- upload lame-<version>.tar.gz to the version directory created above
+- click on the (i) button of the uploaded file, change "Default Download For" (select all, deselect Android)
+- fill "Download Button:" with "<version> source code"
 - save
 - click on the (i) button of the version directory
-- remove the hook from the "Stage this folder for 3 days"
+- remove the tick from "Stage this folder for 3 days"
 - save
-- send mail to lame-dev@lists.sourceforge.net
 - update website (index.php and download.php) to point to the latest LAME release,
   and publish the API documentation for the release along with it (see
   website_update.txt)
-
+- send mail to lame-dev@lists.sourceforge.net
+- start the next version and commit: X.(Y+1) in AC_INIT in configure.ac, run
+  autoconf, and in libmp3lame/version.h LAME_MINOR_VERSION Y+1,
+  LAME_TYPE_VERSION 0, LAME_PATCH_VERSION 0
